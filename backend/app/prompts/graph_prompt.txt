@@ -1,0 +1,89 @@
+Generate a hierarchical learning knowledge graph for the topic: {topic}
+
+Return VALID JSON ONLY.
+
+Schema:
+
+{
+  "overview": {
+    "topic": "",
+    "domain": "",
+    "difficulty": "",
+    "estimated_learning_time": "",
+    "popularity": "",
+    "importance_level": "",
+    "applications": [],
+    "summary": ""
+  },
+
+  "graph": {
+    "nodes": [
+      {
+        "id": "node_1",
+        "name": "Concept Name",
+        "type": "core_concept",
+        "description": "Short description",
+        "difficulty": "Beginner",
+        "importance_score": 0.95,
+        "estimated_learning_time": "2 hours",
+        "prerequisites": [],
+        "unlocks": [],
+        "applications": [],
+        "why_it_matters": "Reason",
+        "depth": 0
+      }
+    ],
+
+    "edges": [
+      {
+        "id": "edge_1",
+        "source": "node_1",
+        "target": "node_2",
+        "relationship": "prerequisite_of"
+      }
+    ]
+  },
+
+  "node_details": {
+    "node_1": {
+      "id": "node_1",
+      "name": "Concept Name",
+      "type": "core_concept",
+      "description": "Detailed description",
+      "difficulty": "Beginner",
+      "importance_score": 0.95,
+      "estimated_learning_time": "2 hours",
+      "prerequisites": [],
+      "unlocks": [],
+      "applications": [],
+      "why_it_matters": "Reason",
+      "depth": 0
+    }
+  }
+}
+
+IMPORTANT:
+
+Use ONLY these node types:
+
+- prerequisite
+- core_concept
+- advanced_concept
+- application
+- framework
+- tool
+- mathematical_foundation
+- related_concept
+
+Requirements:
+
+1. Generate at least 15 nodes.
+2. Generate at least 14 edges.
+3. Build a TREE structure.
+4. Root node must be the topic.
+5. Learning order should flow from beginner to advanced.
+6. Use "name", NEVER use "label".
+7. Use "relationship", NEVER use "label".
+8. Every edge must have an id.
+9. Every node_detail must contain id, name, type.
+10. Return JSON ONLY.

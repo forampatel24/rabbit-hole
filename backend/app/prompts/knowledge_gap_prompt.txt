@@ -1,0 +1,4 @@
+Given a target topic and a list of known concepts, identify which concepts are known, which are missing, and generate a recommended learning path.
+Target topic: {target_topic}
+Known concepts: [{known_concepts}]
+Return VALID JSON ONLY: {"known": [...], "missing": [...], "learning_path": [...]}

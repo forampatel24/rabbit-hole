@@ -1,0 +1,5 @@
+Expand the given node and return only newly discovered nodes and edges as VALID JSON ONLY.
+Node ID: {node_id}
+Current depth: {current_depth}
+Format: {"new_nodes": [...], "new_edges": [...], "new_node_details": {...}}
+No extra text or markdown.
