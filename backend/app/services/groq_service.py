@@ -9,6 +9,13 @@ import os
 import re
 from typing import Dict, Any
 import requests
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+from pathlib import Path
+
+env_path = Path(__file__).resolve().parents[2] / ".env"
+load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +24,26 @@ class GroqService:
     """Service for communicating with Groq API"""
 
     def __init__(self):
-        self.api_key = os.getenv("GROQ_API_KEY", "mock_key_for_dev")
+        # Load .env file
+        load_dotenv()
+        self.api_key = os.getenv("GROQ_API_KEY")
+
+        if not self.api_key:
+            logger.error("GROQ_API_KEY not found in environment variables!")
+            raise ValueError("GROQ_API_KEY environment variable is required")
+
+        # Log that API key is configured (without exposing the full key)
+        key_preview = self.api_key[:10] + "..." + self.api_key[-5:] if len(self.api_key) > 15 else "***"
+        logger.info(f"Groq API configured with key: {key_preview}")
+
         self.api_url = "https://api.groq.com/openai/v1/chat/completions"
         self.model = "llama-3.3-70b-versatile"
-        self.is_mock = self.api_key == "mock_key_for_dev"
+        self.max_retries = 3
 
     def generate(self, prompt: str) -> Dict[str, Any]:
         """
         Send a prompt to Groq and get a response
+        Retries up to 3 times if JSON parsing fails
 
         Args:
             prompt: The prompt to send to Groq
@@ -32,13 +51,40 @@ class GroqService:
         Returns:
             Parsed JSON response from Groq
         """
-        logger.info("Sending request to Groq API")
-        logger.debug(f"Prompt: {prompt[:200]}...")
+        logger.info(f"Starting Groq request for prompt length: {len(prompt)}")
+        logger.debug(f"Prompt preview: {prompt[:200]}...")
 
-        if self.is_mock:
-            logger.info("Running in mock mode - no actual API call")
-            return self._get_mock_response(prompt)
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                logger.info(f"Groq API request attempt {attempt}/{self.max_retries}")
+                response = self._call_groq_api(prompt)
+                logger.info(f"Groq API request successful on attempt {attempt}")
+                return response
+            except json.JSONDecodeError as e:
+                logger.warning(f"JSON parsing failed on attempt {attempt}: {str(e)}")
+                if attempt == self.max_retries:
+                    logger.error(f"Failed to parse JSON after {self.max_retries} attempts")
+                    raise ValueError(f"Could not parse JSON from Groq response after {self.max_retries} retries")
+                # Retry with stricter prompt
+                prompt = self._get_stricter_prompt(prompt)
+                continue
+            except Exception as e:
+                logger.error(f"Error on attempt {attempt}: {str(e)}", exc_info=True)
+                if attempt == self.max_retries:
+                    raise
 
+        raise ValueError("Failed to get response from Groq API")
+
+    def _call_groq_api(self, prompt: str) -> Dict[str, Any]:
+        """
+        Make actual API call to Groq
+
+        Args:
+            prompt: The prompt to send
+
+        Returns:
+            Parsed JSON response
+        """
         try:
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
