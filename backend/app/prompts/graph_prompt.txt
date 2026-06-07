@@ -1,89 +1,56 @@
-Generate a hierarchical learning knowledge graph for the topic: {topic}
+Generate a comprehensive knowledge graph for the topic: {TOPIC}
 
-Return VALID JSON ONLY.
+Return ONLY valid JSON. No markdown, no explanations, no additional text.
 
-Schema:
+The JSON structure MUST be:
 
 {
   "overview": {
-    "topic": "",
-    "domain": "",
-    "difficulty": "",
-    "estimated_learning_time": "",
-    "popularity": "",
-    "importance_level": "",
-    "applications": [],
-    "summary": ""
+    "topic": "{TOPIC}",
+    "domain": "appropriate domain",
+    "difficulty": "Beginner|Intermediate|Advanced",
+    "estimated_learning_time": "time estimate",
+    "popularity": "Low|Medium|High|Very High",
+    "importance_level": "Low|Medium|High|Very High",
+    "applications": ["app1", "app2"],
+    "summary": "brief summary"
   },
-
-  "graph": {
-    "nodes": [
-      {
-        "id": "node_1",
-        "name": "Concept Name",
-        "type": "core_concept",
-        "description": "Short description",
-        "difficulty": "Beginner",
-        "importance_score": 0.95,
-        "estimated_learning_time": "2 hours",
-        "prerequisites": [],
-        "unlocks": [],
-        "applications": [],
-        "why_it_matters": "Reason",
-        "depth": 0
-      }
-    ],
-
-    "edges": [
-      {
-        "id": "edge_1",
-        "source": "node_1",
-        "target": "node_2",
-        "relationship": "prerequisite_of"
-      }
-    ]
-  },
-
-  "node_details": {
-    "node_1": {
-      "id": "node_1",
+  "nodes": [
+    {
+      "id": "unique_lowercase_id",
       "name": "Concept Name",
-      "type": "core_concept",
-      "description": "Detailed description",
-      "difficulty": "Beginner",
-      "importance_score": 0.95,
-      "estimated_learning_time": "2 hours",
-      "prerequisites": [],
-      "unlocks": [],
-      "applications": [],
-      "why_it_matters": "Reason",
+      "type": "prerequisite|core_concept|advanced_concept|application|framework|tool|mathematical_foundation|related_concept",
+      "description": "detailed explanation",
+      "difficulty": "Beginner|Intermediate|Advanced",
+      "importance_score": 8.5,
+      "estimated_learning_time": "duration",
+      "prerequisites": ["id1", "id2"],
+      "unlocks": ["id3", "id4"],
+      "applications": ["app1"],
+      "why_it_matters": "importance explanation",
+      "resources": {},
       "depth": 0
     }
-  }
+  ],
+  "edges": [
+    {
+      "id": "edge_unique_id",
+      "source": "source_id",
+      "target": "target_id",
+      "relationship": "prerequisite|related_concept|advanced_concept|application|framework|tool|mathematical_foundation"
+    }
+  ]
 }
 
-IMPORTANT:
+CRITICAL REQUIREMENTS:
 
-Use ONLY these node types:
-
-- prerequisite
-- core_concept
-- advanced_concept
-- application
-- framework
-- tool
-- mathematical_foundation
-- related_concept
-
-Requirements:
-
-1. Generate at least 15 nodes.
-2. Generate at least 14 edges.
-3. Build a TREE structure.
-4. Root node must be the topic.
-5. Learning order should flow from beginner to advanced.
-6. Use "name", NEVER use "label".
-7. Use "relationship", NEVER use "label".
-8. Every edge must have an id.
-9. Every node_detail must contain id, name, type.
-10. Return JSON ONLY.
+1. MINIMUM 15 nodes required
+2. MINIMUM 14 edges required
+3. Create hierarchical structure: Beginner → Intermediate → Advanced
+4. All node IDs must be lowercase with underscores
+5. All edges must reference existing nodes only
+6. Include diverse node types (not just core_concept)
+7. Include tools, frameworks, and mathematical foundations
+8. Return ONLY the JSON object - no markdown fences, no explanations
+9. Every node must have a unique ID and all required fields
+10. Importance scores should be 0-10 scale
