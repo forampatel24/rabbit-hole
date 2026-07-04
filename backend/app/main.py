@@ -6,7 +6,7 @@ AI-powered knowledge exploration platform
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import health, graph
+from .routes import health, graph, expansion, knowledge_gap
 
 # Configure logging
 logging.basicConfig(
@@ -34,6 +34,8 @@ app.add_middleware(
 # Include routes
 app.include_router(health.router)
 app.include_router(graph.router)
+app.include_router(expansion.router)
+app.include_router(knowledge_gap.router)
 
 # Root endpoint
 @app.get("/")
@@ -48,7 +50,7 @@ async def root():
 async def startup_event():
     """Run on application startup"""
     logger.info("RabbitHole API starting up...")
-    logger.info("API endpoints: GET /api/v1/health, POST /api/v1/generate-graph")
+    logger.info("API endpoints: GET /api/v1/health, POST /api/v1/generate-graph, POST /api/v1/expand-node, POST /api/v1/knowledge-gap")
 
 
 @app.on_event("shutdown")

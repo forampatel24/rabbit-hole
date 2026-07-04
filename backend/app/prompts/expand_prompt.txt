@@ -1,5 +1,50 @@
-Expand the given node and return only newly discovered nodes and edges as VALID JSON ONLY.
-Node ID: {node_id}
-Current depth: {current_depth}
-Format: {"new_nodes": [...], "new_edges": [...], "new_node_details": {...}}
-No extra text or markdown.
+Expand the concept "{node_id}" and discover related sub-concepts, prerequisites, applications, and deeper knowledge.
+
+Current depth level: {current_depth}
+Already existing node IDs (DO NOT recreate): [{existing_node_ids}]
+
+Return ONLY valid JSON. No markdown, no explanations, no additional text.
+
+The JSON structure MUST be:
+
+{
+  "new_nodes": [
+    {
+      "id": "unique_lowercase_id",
+      "name": "Concept Name",
+      "type": "prerequisite|core_concept|advanced_concept|application|framework|tool|mathematical_foundation|related_concept",
+      "description": "detailed explanation",
+      "difficulty": "Beginner|Intermediate|Advanced",
+      "importance_score": 8.5,
+      "estimated_learning_time": "duration",
+      "prerequisites": ["id1", "id2"],
+      "unlocks": ["id3"],
+      "applications": ["app1"],
+      "why_it_matters": "importance explanation",
+      "resources": {},
+      "depth": DEPTH
+    }
+  ],
+  "new_edges": [
+    {
+      "id": "edge_unique_id",
+      "source": "source_id",
+      "target": "target_id",
+      "relationship": "prerequisite|related_concept|advanced_concept|application|framework|tool|mathematical_foundation"
+    }
+  ],
+  "new_node_details": {}
+}
+
+CRITICAL REQUIREMENTS:
+
+1. Generate 3-8 new nodes related to expanding "{node_id}"
+2. Generate edges connecting new nodes to each other and to "{node_id}"
+3. The expanded node ID is: {node_id}
+4. Set depth of new nodes to DEPTH which is {current_depth} + 1
+5. All node IDs must be lowercase with underscores
+6. All edges must reference existing nodes only (either "{node_id}" or newly created nodes)
+7. Include diverse node types (not just related_concept)
+8. Return ONLY the JSON object - no markdown fences, no explanations
+9. Every node must have all required fields
+10. Importance scores should be 0-10 scale

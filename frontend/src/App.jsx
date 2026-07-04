@@ -1,5 +1,5 @@
-import React from 'react'
-import { GraphProvider } from './context/GraphContext'
+import React, { useContext } from 'react'
+import { GraphProvider, GraphContext } from './context/GraphContext'
 import Navbar from './components/Navbar'
 import SearchBar from './components/SearchBar'
 import TopicOverview from './components/TopicOverview'
@@ -8,25 +8,40 @@ import NodePanel from './components/NodePanel'
 import KnowledgeGapPanel from './components/KnowledgeGapPanel'
 import './index.css'
 
-function App(){
+function AppContent() {
+  const { selectedNodeId } = useContext(GraphContext)
+
+  return (
+    <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto px-4">
+        <SearchBar />
+        <TopicOverview />
+
+        <div className="flex-1 flex gap-4 mt-4" style={{ minHeight: '600px' }}>
+          <div className="flex-1">
+            <GraphView />
+          </div>
+
+          {selectedNodeId && (
+            <div className="w-96 shrink-0">
+              <NodePanel />
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 mb-6">
+          <KnowledgeGapPanel />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function App() {
   return (
     <GraphProvider>
-      <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC]">
-        <Navbar />
-        <main className="max-w-6xl mx-auto p-4">
-          <SearchBar />
-          <div className="mt-4 grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <TopicOverview />
-              <GraphView />
-            </div>
-            <div className="col-span-1">
-              <NodePanel />
-              <KnowledgeGapPanel />
-            </div>
-          </div>
-        </main>
-      </div>
+      <AppContent />
     </GraphProvider>
   )
 }

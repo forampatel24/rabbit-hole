@@ -1,4 +1,26 @@
-Given a target topic and a list of known concepts, identify which concepts are known, which are missing, and generate a recommended learning path.
+Analyze the knowledge gap between known concepts and a target topic.
+
 Target topic: {target_topic}
 Known concepts: [{known_concepts}]
-Return VALID JSON ONLY: {"known": [...], "missing": [...], "learning_path": [...]}
+
+Identify which known concepts are relevant prerequisites for the target topic, what concepts are missing, and generate a recommended learning path from the missing concepts to the target.
+
+Return ONLY valid JSON. No markdown, no explanations, no additional text.
+
+The JSON structure MUST be:
+
+{
+  "known": ["concept1", "concept2"],
+  "missing": ["missing_concept1", "missing_concept2"],
+  "learning_path": ["step1", "step2", "step3"]
+}
+
+CRITICAL REQUIREMENTS:
+
+1. known: list of concepts from the "known concepts" input that are relevant as prerequisites for the target topic (only include the input concepts that actually relate to the topic)
+2. missing: list of concepts that are needed to go from the known concepts to the target topic, ordered by prerequisite dependency (first things first)
+3. learning_path: complete ordered list from the first missing prerequisite to the target topic. Each step should build on the previous one.
+4. The learning_path should represent the shortest meaningful path from known to target
+5. All fields must be arrays of strings
+6. If a known concept is not relevant to the target, do not include it
+7. Return ONLY the JSON object - no markdown fences, no explanations

@@ -67,6 +67,32 @@ class HealthResponse(BaseModel):
     service: str
 
 
+class ExpandNodeRequest(BaseModel):
+    """Request schema for node expansion"""
+    node_id: str = Field(..., min_length=1, description="The node ID to expand")
+    current_depth: int = Field(default=1, ge=0, description="Current depth of the node")
+
+
+class ExpandNodeResponse(BaseModel):
+    """Response schema for node expansion"""
+    new_nodes: List[Node]
+    new_edges: List[Edge]
+    new_node_details: Dict[str, Node]
+
+
+class KnowledgeGapRequest(BaseModel):
+    """Request schema for knowledge gap analysis"""
+    known_concepts: List[str] = Field(default_factory=list, description="Concepts the user already knows")
+    target_topic: str = Field(..., min_length=1, description="The target topic to learn")
+
+
+class KnowledgeGapResponse(BaseModel):
+    """Response schema for knowledge gap analysis"""
+    known: List[str]
+    missing: List[str]
+    learning_path: List[str]
+
+
 class ErrorResponse(BaseModel):
     """Error response"""
     error: bool
