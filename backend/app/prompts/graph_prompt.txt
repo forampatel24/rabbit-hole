@@ -65,7 +65,7 @@ Include:
 Do NOT include:
 - Duplicate or redundant concepts
 - Unnecessary filler or tangentially related concepts
-- Every possible sub-topic — leave depth for the "Expand Concept" feature
+- Every possible sub-topic — leave depth for the "Explore More" feature
 
 EDGE RULES:
 - Edges should go from parent to child (hierarchical direction)

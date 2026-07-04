@@ -9,10 +9,9 @@ import requests
 from dotenv import load_dotenv
 from pathlib import Path
 
-env_path = Path(__file__).resolve().parents[2] / ".env"
-load_dotenv(dotenv_path=env_path)
-
 logger = logging.getLogger(__name__)
+
+_ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
 
 
 class RateLimitError(Exception):
@@ -21,9 +20,18 @@ class RateLimitError(Exception):
 
 class GroqService:
     def __init__(self):
-        load_dotenv()
-        self.api_key = os.getenv("GROQ_API_KEY")
-        self.mock_mode = os.getenv("RABBITHOLE_MOCK", "false").lower() == "true"
+        env_loaded = load_dotenv(dotenv_path=_ENV_FILE, override=True)
+        if env_loaded:
+            print(f"[GroqService] Loaded env from {_ENV_FILE}")
+        else:
+            print(f"[GroqService] WARNING: Could not load {_ENV_FILE}")
+
+        self.api_key = os.getenv("GROQ_API_KEY", "").strip()
+        mock_raw = os.getenv("RABBITHOLE_MOCK", "false").strip().lower()
+        self.mock_mode = mock_raw == "true"
+
+        print(f"[GroqService] mock={self.mock_mode} raw='{mock_raw}' key_set={bool(self.api_key)}")
+        logger.info(f"GroqService init: mock={self.mock_mode}, key_set={bool(self.api_key)}")
 
         if not self.api_key or self.api_key == "your_groq_api_key_here":
             logger.warning("GROQ_API_KEY not set or placeholder detected")
@@ -47,7 +55,6 @@ class GroqService:
             return self._get_mock_response(prompt)
 
         logger.info(f"Starting Groq request for prompt length: {len(prompt)}")
-        logger.debug(f"Prompt preview: {prompt[:200]}...")
 
         for attempt in range(1, self.max_retries + 1):
             try:
@@ -172,12 +179,73 @@ class GroqService:
         elif "knowledge gap" in prompt_lower or "gap" in prompt_lower:
             return self._get_mock_knowledge_gap()
         else:
-            return self._get_mock_graph()
+            return self._get_mock_graph(prompt)
 
-    def _get_mock_graph(self) -> Dict[str, Any]:
+    def _get_mock_graph(self, prompt: str = "") -> Dict[str, Any]:
+        topic = "Machine Learning"
+        if prompt:
+            for line in prompt.split("\n"):
+                if line.strip().startswith("Generate a knowledge graph for the topic:"):
+                    topic = line.split(":", 1)[-1].strip()
+                    break
+
+        slug = topic.lower().replace(" ", "_").replace("/", "_")[:20]
+
+        def tn(id_suffix):
+            return f"{slug}_{id_suffix}"
+
+        nodes_raw = [
+            {"id": tn("python"), "name": topic if i == 0 else f"{topic}: {n}", "type": t, "difficulty": d, "importance_score": s, "depth": dep, "prerequisites": [tn(p) if p else "" for p in prereqs], "unlocks": [tn(u) if u else "" for u in unlocks]}
+            for i, (n, t, d, s, dep, prereqs, unlocks) in enumerate([
+                ("Python", "prerequisite", "Beginner", 9.5, 0, [], ["numpy", "pandas", "ml_basics"]),
+                ("NumPy", "core_concept", "Beginner", 9.0, 1, ["python"], ["scipy", "pandas", "linear_algebra"]),
+                ("Pandas", "core_concept", "Beginner", 8.5, 1, ["python", "numpy"], ["data_cleaning", "feature_engineering"]),
+                ("Linear Algebra", "mathematical_foundation", "Intermediate", 9.5, 0, [], ["probability", "calculus", "neural_networks"]),
+                ("Probability & Statistics", "mathematical_foundation", "Intermediate", 8.5, 0, [], ["ml_basics", "bayesian"]),
+                ("ML Basics", "core_concept", "Intermediate", 9.0, 1, ["python", "linear_algebra", "probability"], ["supervised_learning", "unsupervised_learning"]),
+                ("Supervised Learning", "core_concept", "Intermediate", 8.5, 2, ["ml_basics"], ["regression", "classification", "neural_networks"]),
+                ("Unsupervised Learning", "core_concept", "Intermediate", 7.5, 2, ["ml_basics"], ["clustering", "dimensionality_reduction"]),
+                ("Neural Networks", "advanced_concept", "Advanced", 9.5, 2, ["linear_algebra", "supervised_learning"], ["deep_learning", "cnn", "rnn"]),
+                ("Deep Learning", "advanced_concept", "Advanced", 9.0, 3, ["neural_networks"], ["cnn", "rnn", "transformers"]),
+                ("Attention Mechanism", "advanced_concept", "Advanced", 8.5, 4, ["neural_networks"], ["transformers"]),
+                ("Transformers", "advanced_concept", "Advanced", 9.5, 5, ["deep_learning", "attention_mechanism"], ["llms", "nlp"]),
+                ("Scikit-Learn", "tool", "Beginner", 8.0, 1, ["python", "numpy", "pandas"], ["supervised_learning", "unsupervised_learning"]),
+                ("TensorFlow", "framework", "Intermediate", 8.5, 3, ["deep_learning"], ["neural_networks", "nlp"]),
+            ])
+        ]
+
+        nodes = []
+        for nd in nodes_raw:
+            nd["description"] = f"{nd['name']} related to {topic}"
+            nd["estimated_learning_time"] = "varies"
+            nd["applications"] = []
+            nd["why_it_matters"] = f"Important concept in {topic}"
+            nd["resources"] = {}
+            nd["prerequisites"] = [p for p in nd["prerequisites"] if p]
+            nd["unlocks"] = [u for u in nd["unlocks"] if u]
+            nodes.append(nd)
+
+        edges_raw = [
+            (tn("python"), tn("numpy"), "prerequisite"),
+            (tn("python"), tn("pandas"), "prerequisite"),
+            (tn("numpy"), tn("linear_algebra"), "related_concept"),
+            (tn("pandas"), tn("numpy"), "prerequisite"),
+            (tn("linear_algebra"), tn("ml_basics"), "mathematical_foundation"),
+            (tn("probability"), tn("ml_basics"), "mathematical_foundation"),
+            (tn("ml_basics"), tn("supervised_learning"), "prerequisite"),
+            (tn("ml_basics"), tn("unsupervised_learning"), "prerequisite"),
+            (tn("supervised_learning"), tn("neural_networks"), "advanced_concept"),
+            (tn("neural_networks"), tn("deep_learning"), "advanced_concept"),
+            (tn("deep_learning"), tn("attention_mechanism"), "related_concept"),
+            (tn("attention_mechanism"), tn("transformers"), "prerequisite"),
+            (tn("sklearn"), tn("supervised_learning"), "tool"),
+            (tn("tensorflow"), tn("neural_networks"), "framework"),
+        ]
+        edges = [{"id": f"e{i}", "source": s, "target": t, "relationship": r} for i, (s, t, r) in enumerate(edges_raw)]
+
         return {
             "overview": {
-                "topic": "Machine Learning",
+                "topic": topic,
                 "domain": "Artificial Intelligence",
                 "difficulty": "Advanced",
                 "estimated_learning_time": "3-6 months",

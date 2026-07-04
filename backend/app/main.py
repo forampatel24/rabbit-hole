@@ -6,14 +6,24 @@ AI-powered knowledge exploration platform
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from .routes import health, graph, expansion, knowledge_gap
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    force=True,
 )
 logger = logging.getLogger(__name__)
+
+# Middleware that prints every request to terminal
+class RequestLoggerMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        print(f"\n>>> REQUEST: {request.method} {request.url.path}")
+        response = await call_next(request)
+        print(f"<<< RESPONSE: {response.status_code}")
+        return response
 
 # Create FastAPI app
 app = FastAPI(
@@ -30,6 +40,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(RequestLoggerMiddleware)
 
 # Include routes
 app.include_router(health.router)
