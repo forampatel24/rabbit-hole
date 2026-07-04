@@ -1,10 +1,140 @@
 @import "tailwindcss";
 
+@theme {
+  --color-deep-900: #070B1A;
+  --color-deep-800: #0B1225;
+  --color-deep-700: #0F1A30;
+  --color-deep-600: #152240;
+  --color-surface-800: #111827;
+  --color-surface-700: #1E293B;
+  --color-surface-600: #334155;
+  --color-surface-500: #475569;
+  --color-accent-blue: #3B82F6;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-cyan: #06B6D4;
+  --color-accent-green: #10B981;
+  --color-accent-yellow: #F59E0B;
+  --color-accent-red: #EF4444;
+  --color-accent-pink: #EC4899;
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #070B1A;
+  color: #F1F5F9;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
   min-height: 100vh;
+}
+
+.glass {
+  background: rgba(15, 26, 48, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.3);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(15, 26, 48, 0.8), rgba(11, 18, 37, 0.8));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(51, 65, 85, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-fadeInScale {
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.react-flow__node {
+  cursor: pointer;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__controls-button {
+  background: rgba(15, 26, 48, 0.8) !important;
+  border: 1px solid rgba(51, 65, 85, 0.3) !important;
+  color: #94A3B8 !important;
+  fill: #94A3B8 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__controls-button:hover {
+  background: rgba(30, 41, 59, 0.9) !important;
+}
+
+.react-flow__minimap {
+  border-radius: 12px !important;
+  border: 1px solid rgba(51, 65, 85, 0.2) !important;
+  overflow: hidden;
+}
+
+.react-flow__background {
+  background: #070B1A !important;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }

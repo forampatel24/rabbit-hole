@@ -1,133 +1,226 @@
-import React, { useContext, useMemo } from 'react'
-import ReactFlow, { Background, Controls, MarkerType } from 'reactflow'
+import React, { useContext, useState, useEffect, useRef, useCallback } from 'react'
+import ReactFlow, {
+  Background, Controls, MiniMap, ReactFlowProvider,
+  MarkerType,
+} from 'reactflow'
 import 'reactflow/dist/style.css'
+import dagre from 'dagre'
 import { GraphContext } from '../context/GraphContext'
+import CustomNode from './CustomNode'
 
-const nodeTypeColors = {
-  prerequisite: '#3B82F6',
-  core_concept: '#10B981',
-  advanced_concept: '#8B5CF6',
-  application: '#F59E0B',
-  framework: '#EF4444',
-  tool: '#06B6D4',
-  mathematical_foundation: '#EC4899',
-  related_concept: '#94A3B8',
+const nodeTypes = { custom: CustomNode }
+const NODE_W = 180
+const NODE_H = 70
+
+function dagreLayout(nodes, edges) {
+  const g = new dagre.graphlib.Graph()
+  g.setDefaultEdgeLabel(() => ({}))
+  g.setGraph({ rankdir: 'TB', nodesep: 80, ranksep: 120, marginx: 50, marginy: 50 })
+
+  const ids = new Set(nodes.map(n => n.id))
+  nodes.forEach(n => g.setNode(n.id, { width: NODE_W, height: NODE_H }))
+  edges.forEach(e => {
+    if (ids.has(e.source) && ids.has(e.target)) g.setEdge(e.source, e.target)
+  })
+
+  dagre.layout(g)
+
+  return nodes.map(n => {
+    const p = g.node(n.id)
+    if (!p) return { ...n, position: { x: 0, y: 0 } }
+    return { ...n, position: { x: p.x - NODE_W / 2, y: p.y - NODE_H / 2 } }
+  })
 }
 
-function layoutNodes(nodes, edges) {
-  if (nodes.length === 0) return nodes
+function expansionLayout(newNodes, allEdges, frozen) {
+  const frozenIds = Object.keys(frozen)
+  if (frozenIds.length === 0) return newNodes
 
-  const depths = {}
-  const adjacency = {}
-  const reverseAdj = {}
+  const allIds = new Set([...frozenIds, ...newNodes.map(n => n.id)])
 
-  nodes.forEach(n => {
-    depths[n.id] = n.depth ?? 0
-    adjacency[n.id] = []
-    reverseAdj[n.id] = []
+  const g = new dagre.graphlib.Graph()
+  g.setDefaultEdgeLabel(() => ({}))
+  g.setGraph({ rankdir: 'TB', nodesep: 80, ranksep: 120, marginx: 50, marginy: 50 })
+
+  allIds.forEach(id => g.setNode(id, { width: NODE_W, height: NODE_H }))
+  allEdges.forEach(e => {
+    if (allIds.has(e.source) && allIds.has(e.target)) g.setEdge(e.source, e.target)
   })
 
-  edges.forEach(e => {
-    if (adjacency[e.source]) adjacency[e.source].push(e.target)
-    if (reverseAdj[e.target]) reverseAdj[e.target].push(e.source)
-  })
+  dagre.layout(g)
 
-  const levelMap = {}
-  nodes.forEach(n => {
-    const d = n.depth ?? 0
-    if (!levelMap[d]) levelMap[d] = []
-    levelMap[d].push(n.id)
-  })
+  return newNodes.map(n => {
+    const dp = g.node(n.id)
+    if (!dp) return { ...n, position: { x: 0, y: 0 } }
+    const dagrePos = { x: dp.x - NODE_W / 2, y: dp.y - NODE_H / 2 }
 
-  const xSpacing = 280
-  const ySpacing = 120
-  const levels = Object.keys(levelMap).sort((a, b) => Number(a) - Number(b))
-
-  levels.forEach((level, li) => {
-    const ids = levelMap[level]
-    const totalWidth = (ids.length - 1) * xSpacing
-    ids.forEach((id, i) => {
-      const node = nodes.find(n => n.id === id)
-      if (node) {
-        node.position = {
-          x: -totalWidth / 2 + i * xSpacing,
-          y: li * 220 + 40,
+    const pe = allEdges.find(e => e.target === n.id && frozen[e.source])
+    if (pe && frozen[pe.source]) {
+      const parentActual = frozen[pe.source]
+      const parentDagre = g.node(pe.source)
+      if (parentDagre) {
+        const pdp = { x: parentDagre.x - NODE_W / 2, y: parentDagre.y - NODE_H / 2 }
+        return {
+          ...n,
+          position: {
+            x: dagrePos.x + (parentActual.x - pdp.x),
+            y: dagrePos.y + (parentActual.y - pdp.y) + 20,
+          },
         }
       }
-    })
+    }
+    return { ...n, position: dagrePos }
   })
+}
 
-  return nodes
+function toRFNode(n, i) {
+  return {
+    id: n.id,
+    type: 'custom',
+    data: {
+      label: n.name,
+      nodeType: n.type,
+      difficulty: n.difficulty,
+      importance: n.importance_score,
+    },
+    position: { x: 0, y: 0 },
+  }
+}
+
+function toRFEdge(e) {
+  return {
+    id: e.id || `${e.source}-${e.target}`,
+    source: e.source,
+    target: e.target,
+    label: e.relationship,
+    type: 'smoothstep',
+    animated: true,
+    style: { stroke: '#475569', strokeWidth: 2 },
+    labelStyle: { fill: '#64748B', fontSize: 10, fontWeight: 500 },
+    labelBgStyle: { fill: '#0B1225', opacity: 0.8 },
+    labelBgPadding: [6, 3],
+    labelBgBorderRadius: 4,
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#475569', width: 18, height: 18 },
+  }
+}
+
+function GraphFlow() {
+  const { graph, openNodePanel } = useContext(GraphContext)
+  const [renderNodes, setRenderNodes] = useState([])
+  const [renderEdges, setRenderEdges] = useState([])
+  const [generationKey, setGenerationKey] = useState(0)
+  const frozenPositions = useRef({})
+  const prevCount = useRef(0)
+  const fitCalled = useRef(false)
+
+  useEffect(() => {
+    const nodes = graph?.nodes
+    const edges = graph?.edges
+    if (!nodes || nodes.length === 0) {
+      setRenderNodes([])
+      setRenderEdges([])
+      frozenPositions.current = {}
+      prevCount.current = 0
+      return
+    }
+
+    const nCount = nodes.length
+    const frozenIds = Object.keys(frozenPositions.current)
+    const hasOverlap = frozenIds.length > 0 && nodes.some(n => frozenIds.includes(n.id))
+    const isExpansion = frozenIds.length > 0 && nCount > prevCount.current && hasOverlap
+    const rawEdges = edges.map(toRFEdge)
+
+    let positionedNodes
+
+    if (isExpansion) {
+      const existingCount = prevCount.current
+      const existingNodes = nodes.slice(0, existingCount)
+      const newNodes = nodes.slice(existingCount)
+
+      const existingRF = existingNodes.map((n, i) => {
+        const saved = frozenPositions.current[n.id]
+        const base = toRFNode(n, i)
+        return saved ? { ...base, position: { ...saved } } : base
+      })
+
+      const newRF = newNodes.map((n, i) => toRFNode(n, existingCount + i))
+      const positionedNew = expansionLayout(newRF, rawEdges, frozenPositions.current)
+
+      positionedNew.forEach(n => { frozenPositions.current[n.id] = { ...n.position } })
+      positionedNodes = [...existingRF, ...positionedNew]
+    } else {
+      const rawNodes = nodes.map((n, i) => toRFNode(n, i))
+      positionedNodes = dagreLayout(rawNodes, rawEdges)
+      positionedNodes.forEach(n => { frozenPositions.current[n.id] = { ...n.position } })
+    }
+
+    prevCount.current = nCount
+    setRenderNodes(positionedNodes)
+    setRenderEdges(rawEdges)
+    setGenerationKey(k => k + 1)
+  }, [graph])
+
+  const onNodeClick = useCallback((e, node) => openNodePanel(node.id), [openNodePanel])
+
+  const onInit = useCallback((instance) => {
+    if (fitCalled.current) return
+    fitCalled.current = true
+    requestAnimationFrame(() => {
+      instance.fitView({ padding: 0.35, duration: 500 })
+    })
+  }, [])
+
+  const hasNodes = renderNodes.length > 0
+
+  return (
+    <div className="w-full h-full relative" style={{ minHeight: '500px' }}>
+      <ReactFlow
+        key={generationKey || 'empty'}
+        nodes={renderNodes}
+        edges={renderEdges}
+        nodeTypes={nodeTypes}
+        onNodeClick={onNodeClick}
+        onInit={onInit}
+        fitView={false}
+        nodesDraggable={true}
+        nodesConnectable={false}
+        minZoom={0.2}
+        maxZoom={2.5}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          animated: true,
+          style: { stroke: '#475569', strokeWidth: 2 },
+        }}
+      >
+        <Background color="#1E293B" gap={24} size={1} />
+        <Controls showInteractive={false} className="!bottom-4 !left-4 !shadow-none !space-y-1.5" />
+        <MiniMap
+          nodeColor={(n) => {
+            const colors = {
+              prerequisite: '#3B82F6', core_concept: '#10B981', advanced_concept: '#8B5CF6',
+              application: '#F59E0B', framework: '#EF4444', tool: '#06B6D4',
+              mathematical_foundation: '#EC4899',
+            }
+            return colors[n.data?.nodeType] || '#64748B'
+          }}
+          maskColor="rgba(7, 11, 26, 0.7)"
+          style={{ background: '#0B1225', borderRadius: 12, border: '1px solid rgba(51, 65, 85, 0.2)' }}
+          className="!bottom-4 !right-4"
+        />
+      </ReactFlow>
+      {!hasNodes && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <p className="text-text-muted text-sm">Enter a topic to generate a knowledge universe</p>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function GraphView() {
-  const { graph, openNodePanel } = useContext(GraphContext)
-
-  const { rfNodes, rfEdges } = useMemo(() => {
-    const nodes = (graph?.nodes || []).map(n => ({
-      id: n.id,
-      type: 'default',
-      data: {
-        label: n.name,
-      },
-      style: {
-        background: nodeTypeColors[n.type] || '#3B82F6',
-        color: '#F8FAFC',
-        border: 'none',
-        borderRadius: '8px',
-        padding: '10px 16px',
-        fontSize: '13px',
-        fontWeight: 600,
-        minWidth: '120px',
-        textAlign: 'center',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-      },
-      position: n.position || { x: 0, y: 0 },
-    }))
-
-    const laidOut = layoutNodes(nodes, graph?.edges || [])
-
-    const edges = (graph?.edges || []).map(e => ({
-      id: e.id || `${e.source}-${e.target}`,
-      source: e.source,
-      target: e.target,
-      label: e.relationship,
-      style: { stroke: '#475569', strokeWidth: 2 },
-      labelStyle: { fill: '#94A3B8', fontSize: 10 },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        color: '#475569',
-        width: 20,
-        height: 20,
-      },
-    }))
-
-    return { rfNodes: laidOut, rfEdges: edges }
-  }, [graph])
-
-  if (!graph?.nodes?.length) {
-    return (
-      <div className="flex-1 bg-[#071127] rounded flex items-center justify-center" style={{ height: '600px' }}>
-        <p className="text-[#94A3B8] text-lg">Enter a topic to generate a knowledge universe</p>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex-1 bg-[#071127] rounded overflow-hidden" style={{ height: '600px' }}>
-      <ReactFlow
-        nodes={rfNodes}
-        edges={rfEdges}
-        onNodeClick={(e, node) => openNodePanel(node.id)}
-        fitView
-        fitViewOptions={{ padding: 0.3 }}
-        style={{ width: '100%', height: '100%' }}
-        nodesDraggable={true}
-        nodesConnectable={false}
-      >
-        <Background color="#1E293B" gap={20} />
-        <Controls showInteractive={false} />
-      </ReactFlow>
-    </div>
+    <ReactFlowProvider>
+      <GraphFlow />
+    </ReactFlowProvider>
   )
 }

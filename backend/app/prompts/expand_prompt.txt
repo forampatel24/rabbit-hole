@@ -1,4 +1,4 @@
-Expand the concept "{node_id}" and discover related sub-concepts, prerequisites, applications, and deeper knowledge.
+Expand the concept "{node_id}" and discover deeper related sub-concepts.
 
 Current depth level: {current_depth}
 Already existing node IDs (DO NOT recreate): [{existing_node_ids}]
@@ -36,15 +36,24 @@ The JSON structure MUST be:
   "new_node_details": {}
 }
 
-CRITICAL REQUIREMENTS:
+HIERARCHY STRUCTURE REQUIREMENTS:
+- Generate a TREE of sub-concepts branching from "{node_id}"
+- 1-2 nodes at depth {current_depth}+1 (immediate children)
+- 2-4 nodes at depth {current_depth}+2 (grandchildren)
+- Total: 3-8 new nodes across 1-2 depth levels below the expanded node
 
-1. Generate 3-8 new nodes related to expanding "{node_id}"
-2. Generate edges connecting new nodes to each other and to "{node_id}"
-3. The expanded node ID is: {node_id}
-4. Set depth of new nodes to DEPTH which is {current_depth} + 1
-5. All node IDs must be lowercase with underscores
-6. All edges must reference existing nodes only (either "{node_id}" or newly created nodes)
-7. Include diverse node types (not just related_concept)
-8. Return ONLY the JSON object - no markdown fences, no explanations
-9. Every node must have all required fields
-10. Importance scores should be 0-10 scale
+EDGE RULES:
+- Connect new nodes to "{node_id}" and to each other
+- Create clear parent-child relationships
+- Avoid cross-linking between unrelated branches
+- Each new node should connect to 1-2 other nodes
+
+CRITICAL REQUIREMENTS:
+1. Generate 3-8 new nodes
+2. Set depth to {current_depth}+1 or {current_depth}+2
+3. All node IDs must be lowercase with underscores
+4. All edges must reference existing nodes only
+5. Include diverse node types
+6. Return ONLY the JSON object - no markdown fences, no explanations
+7. Every node must have all required fields
+8. Importance scores should be 0-10 scale

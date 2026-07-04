@@ -2,6 +2,8 @@ import logging
 import json
 import os
 import re
+import time
+import random
 from typing import Dict, Any
 import requests
 from dotenv import load_dotenv
@@ -11,6 +13,10 @@ env_path = Path(__file__).resolve().parents[2] / ".env"
 load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
+
+
+class RateLimitError(Exception):
+    pass
 
 
 class GroqService:
@@ -56,6 +62,14 @@ class GroqService:
                     raise ValueError(f"Could not parse JSON from Groq response after {self.max_retries} retries")
                 prompt = self._get_stricter_prompt(prompt)
                 continue
+            except RateLimitError:
+                if attempt == self.max_retries:
+                    logger.error(f"Rate limited after {self.max_retries} attempts")
+                    raise
+                delay = (2 ** attempt) + random.uniform(0, 1)
+                logger.warning(f"Rate limited, retrying in {delay:.1f}s (attempt {attempt}/{self.max_retries})")
+                time.sleep(delay)
+                continue
             except Exception as e:
                 logger.error(f"Error on attempt {attempt}: {str(e)}", exc_info=True)
                 if attempt == self.max_retries:
@@ -94,6 +108,12 @@ class GroqService:
             logger.info("JSON parsing successful")
             return parsed
 
+        except requests.exceptions.HTTPError as e:
+            if e.response is not None and e.response.status_code == 429:
+                logger.warning(f"Rate limited (429): {str(e)}")
+                raise RateLimitError(str(e))
+            logger.error(f"Groq API request failed: {str(e)}", exc_info=True)
+            raise ValueError(f"Failed to communicate with Groq API: {str(e)}")
         except requests.exceptions.RequestException as e:
             logger.error(f"Groq API request failed: {str(e)}", exc_info=True)
             raise ValueError(f"Failed to communicate with Groq API: {str(e)}")

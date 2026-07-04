@@ -1,4 +1,4 @@
-Generate a comprehensive knowledge graph for the topic: {TOPIC}
+Generate a knowledge graph for the topic: {TOPIC}
 
 Return ONLY valid JSON. No markdown, no explanations, no additional text.
 
@@ -42,15 +42,55 @@ The JSON structure MUST be:
   ]
 }
 
-CRITICAL REQUIREMENTS:
+TOPIC SCOPE ASSESSMENT:
+First, assess the topic's scope and complexity. Then choose the appropriate size:
+- NARROW topic (e.g., a specific algorithm, tool, or technique): 8–12 nodes
+- MEDIUM topic (e.g., a well-defined subfield): 12–18 nodes
+- BROAD topic (e.g., a large domain like "Machine Learning"): 18–25 nodes
 
-1. MINIMUM 15 nodes required
-2. MINIMUM 14 edges required
-3. Create hierarchical structure: Beginner → Intermediate → Advanced
+HIERARCHY STRUCTURE REQUIREMENTS:
+
+Organize the knowledge graph as a TREE with the following levels:
+- DEPTH 0: Root node representing the topic itself (1 node)
+- DEPTH 1: Primary branches — major sub-areas or core pillars (2–4 nodes)
+- DEPTH 2: Secondary concepts within each branch
+- DEPTH 3+: Detailed concepts, prerequisites, advanced topics, or applications
+
+Include:
+- The most important prerequisite concepts needed before starting
+- The essential core concepts that define the topic
+- The most important advanced concepts for deeper understanding
+- Important real-world applications where appropriate
+
+Do NOT include:
+- Duplicate or redundant concepts
+- Unnecessary filler or tangentially related concepts
+- Every possible sub-topic — leave depth for the "Expand Concept" feature
+
+EDGE RULES:
+- Edges should go from parent to child (hierarchical direction)
+- Avoid unnecessary cross-links between sibling branches
+- Only add cross-links when concepts genuinely share a direct dependency
+- Each node should have 1–3 edges on average
+- The root node should connect to its primary branches
+
+NODE TYPE GUIDELINES:
+- prerequisite: Foundational knowledge needed before the topic
+- core_concept: Central ideas that define the topic
+- advanced_concept: Deeper or more specialized knowledge
+- application: Practical uses of the knowledge
+- framework: Software or conceptual frameworks
+- tool: Practical tools used
+- mathematical_foundation: Math that underlies the concepts
+
+CRITICAL REQUIREMENTS:
+1. Adapt node count to topic scope (8–25 nodes as described above)
+2. Minimum edges = nodes - 1 (ensures a connected tree)
+3. Create a clear hierarchical tree structure with balanced branches
 4. All node IDs must be lowercase with underscores
 5. All edges must reference existing nodes only
-6. Include diverse node types (not just core_concept)
-7. Include tools, frameworks, and mathematical foundations
-8. Return ONLY the JSON object - no markdown fences, no explanations
-9. Every node must have a unique ID and all required fields
-10. Importance scores should be 0-10 scale
+6. Include diverse node types
+7. Every node must have a unique ID and all required fields
+8. Importance scores should be 0–10 scale
+9. Prioritize quality, correctness, and logical learning progression over quantity
+10. Return ONLY the JSON object — no markdown fences, no explanations

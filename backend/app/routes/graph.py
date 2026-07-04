@@ -6,6 +6,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from ..models.schemas import TopicRequest, GraphResponse, ErrorResponse
 from ..services.graph_service import GraphService
+from ..services.groq_service import RateLimitError
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["graph"])
@@ -45,6 +46,9 @@ async def generate_graph(request: TopicRequest):
 
     except HTTPException:
         raise
+    except RateLimitError as e:
+        logger.warning(f"Rate limited: {str(e)}")
+        raise HTTPException(status_code=429, detail="API rate limit exceeded. Please wait a moment and try again.")
     except ValueError as e:
         logger.error(f"Validation error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))

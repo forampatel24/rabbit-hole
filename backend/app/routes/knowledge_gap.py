@@ -2,6 +2,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from ..models.schemas import KnowledgeGapRequest, KnowledgeGapResponse
 from ..services.knowledge_gap_service import KnowledgeGapService
+from ..services.groq_service import RateLimitError
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["knowledge_gap"])
@@ -27,6 +28,9 @@ async def analyze_knowledge_gap(request: KnowledgeGapRequest):
 
     except HTTPException:
         raise
+    except RateLimitError as e:
+        logger.warning(f"Rate limited: {str(e)}")
+        raise HTTPException(status_code=429, detail="API rate limit exceeded. Please wait a moment and try again.")
     except ValueError as e:
         logger.error(f"Validation error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))

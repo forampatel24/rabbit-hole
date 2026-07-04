@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useState, useCallback, useRef } from 'react'
 import api from '../services/api'
 
 export const GraphContext = createContext()
@@ -12,31 +12,38 @@ export function GraphProvider({ children }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const generateGraph = async (topic) => {
+  const expandedNodes = useRef(new Set())
+
+  const generateGraph = useCallback(async (topic) => {
     if (!topic) return
     setLoading(true)
     setError(null)
+    expandedNodes.current = new Set()
     try {
       const res = await api.post('/generate-graph', { topic })
       setOverview(res.data.overview)
       setGraph(res.data.graph)
       setNodeDetails(res.data.node_details || {})
       setSelectedNodeId(null)
+      setGapResult(null)
     } catch (err) {
       console.error(err)
       setError(err.response?.data?.detail || 'Failed to generate graph')
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const openNodePanel = (id) => {
+  const openNodePanel = useCallback((id) => {
     setSelectedNodeId(id)
-  }
+  }, [])
 
-  const closePanel = () => setSelectedNodeId(null)
+  const closePanel = useCallback(() => setSelectedNodeId(null), [])
 
-  const expandNode = async (nodeId) => {
+  const expandNode = useCallback(async (nodeId) => {
+    if (expandedNodes.current.has(nodeId)) return
+    expandedNodes.current.add(nodeId)
+
     setLoading(true)
     setError(null)
     try {
@@ -51,14 +58,15 @@ export function GraphProvider({ children }) {
       }))
       setNodeDetails(prev => ({ ...prev, ...new_node_details }))
     } catch (e) {
+      expandedNodes.current.delete(nodeId)
       console.error(e)
       setError(e.response?.data?.detail || 'Failed to expand node')
     } finally {
       setLoading(false)
     }
-  }
+  }, [nodeDetails])
 
-  const analyzeKnowledgeGap = async (known_concepts, target_topic) => {
+  const analyzeKnowledgeGap = useCallback(async (known_concepts, target_topic) => {
     setLoading(true)
     setError(null)
     try {
@@ -70,7 +78,7 @@ export function GraphProvider({ children }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   return (
     <GraphContext.Provider value={{
