@@ -19,7 +19,7 @@ The JSON structure MUST be:
     {
       "id": "unique_lowercase_id",
       "name": "Concept Name",
-      "type": "prerequisite|core_concept|advanced_concept|application|framework|tool|mathematical_foundation|related_concept",
+      "type": "prerequisite|core_concept|intermediate_concept|advanced_concept|application|framework|tool|mathematical_foundation|related_concept|subtopic",
       "description": "detailed explanation",
       "difficulty": "Beginner|Intermediate|Advanced",
       "importance_score": 8.5,
@@ -37,60 +37,78 @@ The JSON structure MUST be:
       "id": "edge_unique_id",
       "source": "source_id",
       "target": "target_id",
-      "relationship": "prerequisite|related_concept|advanced_concept|application|framework|tool|mathematical_foundation"
+      "relationship": "prerequisite|related_concept|intermediate_concept|advanced_concept|application|framework|tool|mathematical_foundation|subtopic"
     }
   ]
 }
 
-TOPIC SCOPE ASSESSMENT:
-First, assess the topic's scope and complexity. Then choose the appropriate size:
-- NARROW topic (e.g., a specific algorithm, tool, or technique): 8–12 nodes
-- MEDIUM topic (e.g., a well-defined subfield): 12–18 nodes
-- BROAD topic (e.g., a large domain like "Machine Learning"): 18–25 nodes
+NODE QUANTITY REQUIREMENTS:
 
-HIERARCHY STRUCTURE REQUIREMENTS:
+Generate a DEEP, COMPREHENSIVE graph. The minimum is 25 nodes for ANY topic. For broader or more complex topics, scale up significantly:
+- NARROW topic (e.g., a specific algorithm or technique): 25–34 nodes
+- MEDIUM topic (e.g., a well-defined subfield): 35–49 nodes
+- BROAD topic (e.g., a large domain like "Machine Learning"): 50–60+ nodes
 
-Organize the knowledge graph as a TREE with the following levels:
-- DEPTH 0: Root node representing the topic itself (1 node)
-- DEPTH 1: Primary branches — major sub-areas or core pillars (2–4 nodes)
-- DEPTH 2: Secondary concepts within each branch
-- DEPTH 3+: Detailed concepts, prerequisites, advanced topics, or applications
+These are minimums. Go beyond when the topic warrants it. Do not cap at 25 for broad topics.
 
-Include:
-- The most important prerequisite concepts needed before starting
-- The essential core concepts that define the topic
-- The most important advanced concepts for deeper understanding
-- Important real-world applications where appropriate
+DEPTH AND STRUCTURE REQUIREMENTS:
+
+Build a graph with genuine depth (not just breadth). Structure it across these layers:
+
+- PREREQUISITES (depth 0–1): Multiple foundational concepts required before starting. Break prerequisites into meaningful subtopics.
+- CORE CONCEPTS (depth 1–2): The essential pillars of the topic. Each major pillar should be decomposed into 2–5 meaningful subtopics.
+- INTERMEDIATE CONCEPTS (depth 2–3): Concepts that build on core ideas but are not yet advanced. These bridge the gap between foundational and specialized knowledge.
+- ADVANCED CONCEPTS (depth 3–4): Deeper/specialized areas. Each advanced area should have its own subtopics.
+- RELATED CONCEPTS (depth 1–3): Neighboring domains or complementary topics that connect to the main topic.
+- TOOLS & FRAMEWORKS (depth 1–3): Where applicable, include practical tools, libraries, frameworks, and platforms.
+- APPLICATIONS & USE CASES (depth 1–3): Real-world applications, industries, and practical implementations. Break applications into specific sub-applications.
+- SUBTOPICS: Every major concept (core, intermediate, advanced) should be broken down into 2–5 meaningful subtopics wherever appropriate. Avoid monolithic nodes.
+
+INCLUDE THESE CATEGORIES:
+- At least 3–5 prerequisite concepts (broken into subtopics where meaningful)
+- At least 5–8 core concepts (each with 2–5 subtopics)
+- At least 3–5 intermediate concepts that bridge core and advanced content
+- At least 3–5 advanced concepts (with subtopics)
+- At least 2–3 related or adjacent concepts showing connections to other fields
+- Tools, frameworks, or technologies relevant to the topic (where applicable)
+- Real-world applications broken into specific sub-categories
+- Mathematical, theoretical, or conceptual foundations as appropriate
 
 Do NOT include:
-- Duplicate or redundant concepts
-- Unnecessary filler or tangentially related concepts
-- Every possible sub-topic — leave depth for the "Explore More" feature
+- Duplicate or redundant concepts under different names
+- Filler nodes that are only tangentially related
+- Trivial concepts that add no educational value
+- Overly generic placeholders like "Other Applications" or "Miscellaneous"
 
 EDGE RULES:
-- Edges should go from parent to child (hierarchical direction)
-- Avoid unnecessary cross-links between sibling branches
-- Only add cross-links when concepts genuinely share a direct dependency
-- Each node should have 1–3 edges on average
-- The root node should connect to its primary branches
+- Build a well-connected graph, not just a simple tree
+- Include prerequisite relationships from foundational to advanced
+- Add cross-connections between related sub-branches where genuine dependencies exist
+- Each node should have 2–5 edges on average (both incoming and outgoing)
+- The root topic node should connect to its major branches
+- Include at least one edge connecting related concepts from different branches
+- Every node (except root and leaf nodes) should have both prerequisites and unlocks
 
 NODE TYPE GUIDELINES:
-- prerequisite: Foundational knowledge needed before the topic
-- core_concept: Central ideas that define the topic
-- advanced_concept: Deeper or more specialized knowledge
-- application: Practical uses of the knowledge
-- framework: Software or conceptual frameworks
-- tool: Practical tools used
-- mathematical_foundation: Math that underlies the concepts
+- prerequisite: Foundational knowledge needed before the topic (depth 0–1)
+- core_concept: Central ideas that define the topic (depth 1–2)
+- intermediate_concept: Bridge concepts between core and advanced (depth 2–3)
+- advanced_concept: Deeper or more specialized knowledge (depth 3–4)
+- application: Practical uses of the knowledge (depth 1–3)
+- framework: Software or conceptual frameworks (depth 1–3)
+- tool: Practical tools, libraries, or platforms (depth 1–3)
+- mathematical_foundation: Math or theory underlying concepts (depth 0–2)
+- related_concept: Adjacent or complementary topics (depth 1–3)
+- subtopic: A meaningful sub-division of a larger concept (depth 2–4)
 
 CRITICAL REQUIREMENTS:
-1. Adapt node count to topic scope (8–25 nodes as described above)
-2. Minimum edges = nodes - 1 (ensures a connected tree)
-3. Create a clear hierarchical tree structure with balanced branches
+1. Generate at least 25 nodes for every topic; scale to 35–60+ for broad or complex topics
+2. Minimum edges = nodes * 1.5 (ensures dense connectivity)
+3. Assign depth values accurately (0 for root, 1 for immediate children, increasing with granularity)
 4. All node IDs must be lowercase with underscores
 5. All edges must reference existing nodes only
-6. Include diverse node types
+6. Include a diverse mix of node types — use all applicable types
 7. Every node must have a unique ID and all required fields
-8. Importance scores should be 0–10 scale
-9. Prioritize quality, correctness, and logical learning progression over quantity
+8. Importance scores should be on a 0–10 scale with genuine variance
+9. Ensure logical learning progression: prerequisites → core → intermediate → advanced
 10. Return ONLY the JSON object — no markdown fences, no explanations
