@@ -73,7 +73,7 @@ function expansionLayout(newNodes, allEdges, frozen) {
   })
 }
 
-function toRFNode(n, i) {
+function toRFNode(n, i, completions) {
   return {
     id: n.id,
     type: 'custom',
@@ -82,6 +82,7 @@ function toRFNode(n, i) {
       nodeType: n.type,
       difficulty: n.difficulty,
       importance: n.importance_score,
+      completed: completions?.[n.id] || false,
     },
     position: { x: 0, y: 0 },
   }
@@ -105,7 +106,7 @@ function toRFEdge(e) {
 }
 
 function GraphFlow() {
-  const { graph, openNodePanel } = useContext(GraphContext)
+  const { graph, openNodePanel, completions } = useContext(GraphContext)
   const [renderNodes, setRenderNodes] = useState([])
   const [renderEdges, setRenderEdges] = useState([])
   const [generationKey, setGenerationKey] = useState(0)
@@ -139,17 +140,17 @@ function GraphFlow() {
 
       const existingRF = existingNodes.map((n, i) => {
         const saved = frozenPositions.current[n.id]
-        const base = toRFNode(n, i)
+        const base = toRFNode(n, i, completions)
         return saved ? { ...base, position: { ...saved } } : base
       })
 
-      const newRF = newNodes.map((n, i) => toRFNode(n, existingCount + i))
+      const newRF = newNodes.map((n, i) => toRFNode(n, existingCount + i, completions))
       const positionedNew = expansionLayout(newRF, rawEdges, frozenPositions.current)
 
       positionedNew.forEach(n => { frozenPositions.current[n.id] = { ...n.position } })
       positionedNodes = [...existingRF, ...positionedNew]
     } else {
-      const rawNodes = nodes.map((n, i) => toRFNode(n, i))
+      const rawNodes = nodes.map((n, i) => toRFNode(n, i, completions))
       positionedNodes = dagreLayout(rawNodes, rawEdges)
       positionedNodes.forEach(n => { frozenPositions.current[n.id] = { ...n.position } })
     }
@@ -158,7 +159,8 @@ function GraphFlow() {
     setRenderNodes(positionedNodes)
     setRenderEdges(rawEdges)
     setGenerationKey(k => k + 1)
-  }, [graph])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [graph, completions])
 
   const onNodeClick = useCallback((e, node) => openNodePanel(node.id), [openNodePanel])
 
@@ -196,6 +198,7 @@ function GraphFlow() {
         <Controls showInteractive={false} className="!bottom-4 !left-4 !shadow-none !space-y-1.5" />
         <MiniMap
           nodeColor={(n) => {
+            if (n.data?.completed) return '#10B981'
             const colors = {
               prerequisite: '#3B82F6', core_concept: '#10B981', advanced_concept: '#8B5CF6',
               application: '#F59E0B', framework: '#EF4444', tool: '#06B6D4',

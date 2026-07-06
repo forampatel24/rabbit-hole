@@ -12,6 +12,10 @@ export function GraphProvider({ children }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  const [savedGraphId, setSavedGraphId] = useState(null)
+  const [notes, setNotes] = useState('')
+  const [completions, setCompletions] = useState({})
+
   const expandedNodes = useRef(new Set())
 
   const generateGraph = useCallback(async (topic) => {
@@ -19,6 +23,9 @@ export function GraphProvider({ children }) {
     setLoading(true)
     setError(null)
     expandedNodes.current = new Set()
+    setSavedGraphId(null)
+    setNotes('')
+    setCompletions({})
     try {
       const res = await api.post('/generate-graph', { topic })
       setOverview(res.data.overview)
@@ -80,6 +87,99 @@ export function GraphProvider({ children }) {
     }
   }, [])
 
+  const saveGraph = useCallback(async () => {
+    if (!overview) return
+    setLoading(true)
+    setError(null)
+    try {
+      const payload = {
+        topic: overview.topic,
+        overview,
+        graph,
+        node_details: nodeDetails,
+      }
+      let res
+      if (savedGraphId) {
+        res = await api.put(`/graphs/${savedGraphId}`, payload)
+      } else {
+        res = await api.post('/graphs/save', payload)
+        setSavedGraphId(res.data.id)
+      }
+      if (notes.trim()) {
+        await api.put(`/graphs/${res.data.id || savedGraphId}/notes`, { content: notes })
+      }
+      return res.data
+    } catch (err) {
+      console.error(err)
+      setError(err.response?.data?.detail || 'Failed to save graph')
+    } finally {
+      setLoading(false)
+    }
+  }, [overview, graph, nodeDetails, notes, savedGraphId])
+
+  const deleteGraph = useCallback(async (graphId) => {
+    setLoading(true)
+    setError(null)
+    try {
+      await api.delete(`/graphs/${graphId}`)
+      if (savedGraphId === graphId) {
+        setSavedGraphId(null)
+      }
+    } catch (err) {
+      console.error(err)
+      setError(err.response?.data?.detail || 'Failed to delete graph')
+    } finally {
+      setLoading(false)
+    }
+  }, [savedGraphId])
+
+  const loadSavedGraph = useCallback(async (id) => {
+    setLoading(true)
+    setError(null)
+    expandedNodes.current = new Set()
+    try {
+      const res = await api.get(`/graphs/open/${id}`)
+      setSavedGraphId(res.data.id)
+      setOverview(res.data.overview)
+      setGraph(res.data.graph)
+      setNodeDetails(res.data.node_details)
+      setNotes(res.data.notes || '')
+      setCompletions(res.data.completions || {})
+      setSelectedNodeId(null)
+      setGapResult(null)
+    } catch (err) {
+      console.error(err)
+      setError(err.response?.data?.detail || 'Failed to load graph')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const saveNotes = useCallback(async (content) => {
+    if (!savedGraphId) return
+    try {
+      await api.put(`/graphs/${savedGraphId}/notes`, { content })
+      setNotes(content)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [savedGraphId])
+
+  const toggleCompletion = useCallback(async (nodeId) => {
+    if (!savedGraphId) return
+    const current = completions[nodeId] || false
+    const newState = !current
+    try {
+      const res = await api.put(`/graphs/${savedGraphId}/completion`, {
+        node_id: nodeId,
+        completed: newState,
+      })
+      setCompletions(prev => ({ ...prev, [nodeId]: newState }))
+    } catch (err) {
+      console.error(err)
+    }
+  }, [savedGraphId, completions])
+
   return (
     <GraphContext.Provider value={{
       overview,
@@ -89,6 +189,9 @@ export function GraphProvider({ children }) {
       gapResult,
       loading,
       error,
+      savedGraphId,
+      notes,
+      completions,
       generateGraph,
       openNodePanel,
       closePanel,
@@ -96,6 +199,12 @@ export function GraphProvider({ children }) {
       analyzeKnowledgeGap,
       setGraph,
       setError,
+      saveGraph,
+      loadSavedGraph,
+      deleteGraph,
+      saveNotes,
+      toggleCompletion,
+      setNotes,
     }}>
       {children}
     </GraphContext.Provider>

@@ -1,9 +1,10 @@
 import React, { useContext } from 'react'
 import { GraphContext } from '../context/GraphContext'
+import { AuthContext } from '../context/AuthContext'
 import {
   FiX, FiBook, FiBarChart2, FiClock, FiStar,
   FiArrowRight, FiGrid, FiHeart, FiExternalLink,
-  FiChevronRight, FiZap, FiLayers
+  FiChevronRight, FiZap, FiLayers, FiCheckCircle, FiCircle
 } from 'react-icons/fi'
 
 const difficultyColors = {
@@ -13,12 +14,14 @@ const difficultyColors = {
 }
 
 export default function NodePanel() {
-  const { selectedNodeId, nodeDetails, closePanel, expandNode } = useContext(GraphContext)
+  const { selectedNodeId, nodeDetails, closePanel, expandNode, savedGraphId, completions, toggleCompletion } = useContext(GraphContext)
+  const { user } = useContext(AuthContext)
   if (!selectedNodeId) return null
   const node = nodeDetails[selectedNodeId]
   if (!node) return null
 
   const badgeColor = difficultyColors[node.difficulty] || difficultyColors.Intermediate
+  const isCompleted = completions?.[selectedNodeId] || false
 
   return (
     <div className="glass-card rounded-2xl h-full overflow-hidden flex flex-col">
@@ -40,6 +43,23 @@ export default function NodePanel() {
             <FiX size={16} />
           </button>
         </div>
+
+        {savedGraphId && user && (
+          <button
+            onClick={() => toggleCompletion(selectedNodeId)}
+            className={`mt-3 w-full px-3 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all ${
+              isCompleted
+                ? 'bg-accent-green/10 text-accent-green border border-accent-green/30'
+                : 'bg-deep-700/50 text-text-muted border border-surface-600/20 hover:border-accent-green/30 hover:text-accent-green'
+            }`}
+          >
+            {isCompleted ? (
+              <><FiCheckCircle size={14} /> Completed</>
+            ) : (
+              <><FiCircle size={14} /> Mark as Completed</>
+            )}
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 space-y-5">
@@ -107,7 +127,7 @@ export default function NodePanel() {
         )}
       </div>
 
-      <div className="p-4 border-t border-surface-700/20">
+      <div className="p-4 border-t border-surface-700/20 space-y-2">
         <button
           onClick={() => expandNode(node.id)}
           className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-accent-blue to-accent-purple text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"

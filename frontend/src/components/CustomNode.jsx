@@ -2,7 +2,7 @@ import React, { memo } from 'react'
 import { Handle, Position } from 'reactflow'
 import {
   FiBook, FiCpu, FiZap, FiGrid, FiTool,
-  FiLayers, FiHash, FiBox
+  FiLayers, FiHash, FiBox, FiCheckCircle
 } from 'react-icons/fi'
 
 const nodeTypeConfig = {
@@ -58,6 +58,7 @@ function CustomNode({ data, selected }) {
   const config = nodeTypeConfig[data.nodeType] || nodeTypeConfig.related_concept
   const Icon = config.icon
   const badgeColor = difficultyBadges[data.difficulty] || difficultyBadges.Intermediate
+  const completed = data.completed
 
   return (
     <div
@@ -72,10 +73,14 @@ function CustomNode({ data, selected }) {
         className={`rounded-xl border-2 transition-all duration-200 min-w-[140px] ${
           selected
             ? 'border-accent-purple shadow-lg shadow-accent-purple/20'
-            : 'border-transparent hover:border-surface-600/40'
+            : completed
+              ? 'border-accent-green/50'
+              : 'border-transparent hover:border-surface-600/40'
         }`}
         style={{
-          background: 'linear-gradient(135deg, rgba(15, 26, 48, 0.95), rgba(11, 18, 37, 0.95))',
+          background: completed
+            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(11, 18, 37, 0.95))'
+            : 'linear-gradient(135deg, rgba(15, 26, 48, 0.95), rgba(11, 18, 37, 0.95))',
         }}
       >
         <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
@@ -86,6 +91,9 @@ function CustomNode({ data, selected }) {
             <Icon style={{ color: config.color, fontSize: '12px' }} />
           </div>
           <span className="text-sm font-semibold text-text-primary leading-tight">{data.label}</span>
+          {completed && (
+            <FiCheckCircle className="text-accent-green shrink-0" size={14} />
+          )}
         </div>
 
         <div className="flex items-center gap-1.5 px-3 pb-2.5">
