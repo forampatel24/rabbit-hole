@@ -1,18 +1,13 @@
-"""
-Pydantic schemas for RabbitHole API
-"""
-
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Any
 
 
 class TopicRequest(BaseModel):
-    """Request schema for topic input"""
     topic: str = Field(..., min_length=1, max_length=200, description="The topic to generate a knowledge graph for")
+    mode: str = Field(default="learn", description="Exploration mode: learn, interview, project, research, quick")
 
 
 class Overview(BaseModel):
-    """Topic overview information"""
     topic: str
     domain: str
     difficulty: str
@@ -24,7 +19,6 @@ class Overview(BaseModel):
 
 
 class Node(BaseModel):
-    """Node in the knowledge graph"""
     id: str
     name: str
     type: str
@@ -41,7 +35,6 @@ class Node(BaseModel):
 
 
 class Edge(BaseModel):
-    """Edge between nodes in the knowledge graph"""
     id: str
     source: str
     target: str
@@ -49,45 +42,38 @@ class Edge(BaseModel):
 
 
 class Graph(BaseModel):
-    """Knowledge graph structure"""
     nodes: List[Node]
     edges: List[Edge]
 
 
 class GraphResponse(BaseModel):
-    """Response for graph generation"""
     overview: Overview
     graph: Graph
     node_details: Dict[str, Node]
 
 
 class HealthResponse(BaseModel):
-    """Health check response"""
     status: str
     service: str
 
 
 class ExpandNodeRequest(BaseModel):
-    """Request schema for node expansion"""
     node_id: str = Field(..., min_length=1, description="The node ID to expand")
     current_depth: int = Field(default=1, ge=0, description="Current depth of the node")
 
 
 class ExpandNodeResponse(BaseModel):
-    """Response schema for node expansion"""
     new_nodes: List[Node]
     new_edges: List[Edge]
     new_node_details: Dict[str, Node]
 
 
 class KnowledgeGapRequest(BaseModel):
-    """Request schema for knowledge gap analysis"""
     known_concepts: List[str] = Field(default_factory=list, description="Concepts the user already knows")
     target_topic: str = Field(..., min_length=1, description="The target topic to learn")
 
 
 class KnowledgeGapResponse(BaseModel):
-    """Response schema for knowledge gap analysis"""
     known: List[str]
     missing: List[str]
     learning_path: List[str]
@@ -133,9 +119,51 @@ class LearningResourcesResponse(BaseModel):
     github: List[GitHubResource] = Field(default_factory=list)
 
 
+class CollectionCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+
+
+class CollectionRename(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+
+
+class CollectionResponse(BaseModel):
+    id: int
+    name: str
+    created_at: str
+    graph_count: int = 0
+
+
+class CollectionDetail(BaseModel):
+    id: int
+    name: str
+    created_at: str
+    graphs: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class GraphMoveRequest(BaseModel):
+    target_collection_id: Optional[int] = None
+
+
+class GraphCopyRequest(BaseModel):
+    target_collection_id: int
+
+
+class SearchResult(BaseModel):
+    id: int
+    topic: str
+    collection_name: Optional[str] = None
+    collection_id: Optional[int] = None
+    created_at: str
+    completed_count: int = 0
+    total_count: int = 0
+
+
+class SearchResults(BaseModel):
+    results: List[SearchResult] = Field(default_factory=list)
+
+
 class ErrorResponse(BaseModel):
-    """Error response"""
     error: bool
     message: str
     code: str
-

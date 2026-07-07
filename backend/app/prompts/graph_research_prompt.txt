@@ -1,0 +1,86 @@
+Generate a research-oriented knowledge graph for the topic: {TOPIC}
+
+Return ONLY valid JSON. No markdown, no explanations, no additional text.
+
+The JSON structure MUST be:
+{
+  "overview": {
+    "topic": "{TOPIC}",
+    "domain": "appropriate domain",
+    "difficulty": "Beginner|Intermediate|Advanced",
+    "estimated_learning_time": "time estimate",
+    "popularity": "Low|Medium|High|Very High",
+    "importance_level": "Low|Medium|High|Very High",
+    "applications": ["app1", "app2"],
+    "summary": "brief summary with research context"
+  },
+  "nodes": [
+    {
+      "id": "unique_lowercase_id",
+      "name": "Concept Name",
+      "type": "foundation|seminal_work|recent_advance|research_direction|method|state_of_art|open_problem|related_field|tool|benchmark",
+      "description": "detailed explanation with research context",
+      "difficulty": "Beginner|Intermediate|Advanced",
+      "importance_score": 8.5,
+      "estimated_learning_time": "duration",
+      "prerequisites": ["id1", "id2"],
+      "unlocks": ["id3", "id4"],
+      "applications": ["app1"],
+      "why_it_matters": "research significance and impact",
+      "resources": {},
+      "depth": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_unique_id",
+      "source": "source_id",
+      "target": "target_id",
+      "relationship": "foundation|builds_upon|inspires|challenges|improves|related_to|state_of_art|method"
+    }
+  ]
+}
+
+MODE: RESEARCH
+This graph is for someone exploring the research landscape.
+
+FOCUS ON:
+- Seminal papers and foundational works
+- State-of-the-art methods and approaches
+- Recent advances and breakthrough results
+- Active research directions and open problems
+- Key researchers and institutions
+- Benchmarks and evaluation methodologies
+- Current challenges and limitations
+- Emerging trends and future directions
+
+STRUCTURE:
+- FOUNDATIONS (depth 0-1): Classic papers, fundamental theories, historical context
+- SEMINAL WORKS (depth 1-2): Landmark papers that defined the field
+- STATE OF THE ART (depth 1-3): Current best-performing methods
+- RESEARCH DIRECTIONS (depth 2-3): Active areas of investigation
+- OPEN PROBLEMS (depth 2-3): Unsolved challenges and limitations
+- METHODS & TECHNIQUES (depth 1-3): Key methodological approaches
+- BENCHMARKS & DATASETS (depth 1-2): Standard evaluation resources
+- RELATED FIELDS (depth 1-2): Adjacent research areas
+
+NODE QUANTITY:
+- Generate 20-30 nodes
+- Prioritize high-impact and influential concepts
+
+Include in descriptions:
+- Key papers or authors associated with this concept
+- Significance and impact on the field
+- Current state and limitations
+- Links to related research directions
+
+Do NOT include:
+- Purely introductory content covered in standard textbooks
+- Outdated or superseded approaches without historical significance
+- Commercial products without research relevance
+
+CRITICAL REQUIREMENTS:
+1. Generate 20-30 nodes
+2. All node IDs must be lowercase with underscores
+3. All edges must reference existing nodes
+4. Return ONLY the JSON object — no markdown fences

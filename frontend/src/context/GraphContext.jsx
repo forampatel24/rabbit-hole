@@ -17,10 +17,11 @@ export function GraphProvider({ children }) {
   const [completions, setCompletions] = useState({})
   const [resources, setResources] = useState({})
   const [resourceLoading, setResourceLoading] = useState({})
+  const [mode, setMode] = useState('learn')
 
   const expandedNodes = useRef(new Set())
 
-  const generateGraph = useCallback(async (topic) => {
+  const generateGraph = useCallback(async (topic, exploreMode) => {
     if (!topic) return
     setLoading(true)
     setError(null)
@@ -29,7 +30,7 @@ export function GraphProvider({ children }) {
     setNotes('')
     setCompletions({})
     try {
-      const res = await api.post('/generate-graph', { topic })
+      const res = await api.post('/generate-graph', { topic, mode: exploreMode || mode })
       setOverview(res.data.overview)
       setGraph(res.data.graph)
       setNodeDetails(res.data.node_details || {})
@@ -41,7 +42,7 @@ export function GraphProvider({ children }) {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [mode])
 
   const openNodePanel = useCallback((id) => {
     setSelectedNodeId(id)
@@ -212,6 +213,8 @@ export function GraphProvider({ children }) {
       completions,
       resources,
       resourceLoading,
+      mode,
+      setMode,
       generateGraph,
       fetchResources,
       openNodePanel,

@@ -43,7 +43,7 @@ function AppContent() {
       <LoadingOverlay />
 
       <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto px-6">
-        <div className="mt-4">
+        <div className="mt-4 relative z-[9999]">
           <SearchBar />
         </div>
 

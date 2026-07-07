@@ -1,0 +1,80 @@
+Generate a knowledge graph for interview preparation on the topic: {TOPIC}
+
+Return ONLY valid JSON. No markdown, no explanations, no additional text.
+
+The JSON structure MUST be:
+{
+  "overview": {
+    "topic": "{TOPIC}",
+    "domain": "appropriate domain",
+    "difficulty": "Beginner|Intermediate|Advanced",
+    "estimated_learning_time": "time estimate",
+    "popularity": "Low|Medium|High|Very High",
+    "importance_level": "Low|Medium|High|Very High",
+    "applications": ["app1", "app2"],
+    "summary": "brief summary focused on interview relevance"
+  },
+  "nodes": [
+    {
+      "id": "unique_lowercase_id",
+      "name": "Concept Name",
+      "type": "prerequisite|core_concept|intermediate_concept|advanced_concept|application|framework|tool|mathematical_foundation|related_concept|subtopic",
+      "description": "detailed explanation with interview context",
+      "difficulty": "Beginner|Intermediate|Advanced",
+      "importance_score": 8.5,
+      "estimated_learning_time": "duration",
+      "prerequisites": ["id1", "id2"],
+      "unlocks": ["id3", "id4"],
+      "applications": ["app1"],
+      "why_it_matters": "why this matters for interviews",
+      "resources": {},
+      "depth": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_unique_id",
+      "source": "source_id",
+      "target": "target_id",
+      "relationship": "prerequisite|related_concept|intermediate_concept|advanced_concept|application|framework|tool|mathematical_foundation|subtopic"
+    }
+  ]
+}
+
+MODE: INTERVIEW PREPARATION
+This graph is for someone preparing for technical interviews.
+
+FOCUS ON:
+- Frequently asked interview questions and concepts
+- Important algorithms, data structures, and problem-solving patterns
+- Common pitfalls and edge cases interviewers test
+- Key concepts that interviewers expect candidates to know
+- Practical coding patterns and approaches
+- System design concepts where applicable
+- Time and space complexity analysis
+
+NODE QUANTITY:
+- Generate 20-30 nodes focused on interview-relevant content
+- Quality over breadth - cover what matters for interviews
+
+DEPTH AND STRUCTURE:
+- Prerequisites (depth 0-1): Foundational knowledge interviewers assume
+- Core Concepts (depth 1-2): Must-know topics for interviews
+- Advanced Topics (depth 2-3): Differentiation topics for senior roles
+- Common Problems (depth 1-3): Frequently asked problem categories with specific examples
+
+Include in descriptions:
+- Why this concept is frequently asked
+- Common mistakes or pitfalls
+- Key techniques or patterns to remember
+
+Do NOT include:
+- Overly theoretical content rarely asked in interviews
+- Trivial or filler concepts
+- Obsolete technologies or approaches
+
+CRITICAL REQUIREMENTS:
+1. Generate 20-30 nodes
+2. All node IDs must be lowercase with underscores
+3. All edges must reference existing nodes
+4. Return ONLY the JSON object — no markdown fences

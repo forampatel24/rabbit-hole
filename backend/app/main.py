@@ -7,7 +7,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from .routes import health, graph, expansion, knowledge_gap, auth, graph_storage, resources
+from .routes import health, graph, expansion, knowledge_gap, auth, graph_storage, resources, collections
 from .database import engine, Base
 
 # Configure logging
@@ -52,6 +52,7 @@ app.include_router(knowledge_gap.router)
 app.include_router(auth.router)
 app.include_router(graph_storage.router)
 app.include_router(resources.router)
+app.include_router(collections.router)
 
 # Root endpoint
 @app.get("/")
@@ -67,6 +68,24 @@ async def startup_event():
     """Run on application startup"""
     logger.info("RabbitHole API starting up...")
     Base.metadata.create_all(bind=engine)
+
+    # Migrate existing tables: add collection_id to saved_graphs if missing
+    try:
+        from sqlalchemy import inspect
+        inspector = inspect(engine)
+        columns = [col["name"] for col in inspector.get_columns("saved_graphs")]
+        if "collection_id" not in columns:
+            with engine.connect() as conn:
+                conn.execute(
+                    __import__("sqlalchemy").text(
+                        "ALTER TABLE saved_graphs ADD COLUMN collection_id INTEGER REFERENCES collections(id) ON DELETE SET NULL"
+                    )
+                )
+                conn.commit()
+            logger.info("Added collection_id column to saved_graphs")
+    except Exception as e:
+        logger.warning(f"Migration note: {e}")
+
     logger.info("Database tables created")
     logger.info("API endpoints: GET /api/v1/health, POST /api/v1/generate-graph, POST /api/v1/expand-node, POST /api/v1/knowledge-gap")
 

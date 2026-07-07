@@ -1,0 +1,84 @@
+Generate a project-building knowledge graph for: {TOPIC}
+
+Return ONLY valid JSON. No markdown, no explanations, no additional text.
+
+The JSON structure MUST be:
+{
+  "overview": {
+    "topic": "{TOPIC}",
+    "domain": "appropriate domain",
+    "difficulty": "Beginner|Intermediate|Advanced",
+    "estimated_learning_time": "time estimate",
+    "popularity": "Low|Medium|High|Very High",
+    "importance_level": "Low|Medium|High|Very High",
+    "applications": ["app1", "app2"],
+    "summary": "brief summary of what this project involves"
+  },
+  "nodes": [
+    {
+      "id": "unique_lowercase_id",
+      "name": "Concept Name",
+      "type": "goal|technology|prerequisite|implementation|deployment|tool|framework|concept|api|database|service",
+      "description": "detailed explanation",
+      "difficulty": "Beginner|Intermediate|Advanced",
+      "importance_score": 8.5,
+      "estimated_learning_time": "duration",
+      "prerequisites": ["id1", "id2"],
+      "unlocks": ["id3", "id4"],
+      "applications": ["app1"],
+      "why_it_matters": "why this is needed for the project",
+      "resources": {},
+      "depth": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_unique_id",
+      "source": "source_id",
+      "target": "target_id",
+      "relationship": "prerequisite|implements|deploys|uses|builds_upon|requires|technology|tool|deployment"
+    }
+  ]
+}
+
+MODE: PROJECT BUILDING
+This graph is for someone who wants to BUILD something practical.
+
+STRUCTURE THE GRAPH AS A PROJECT ROADMAP:
+- GOAL (depth 0): The main project goal — what are we building?
+- REQUIRED TECHNOLOGIES (depth 1): Core technologies, languages, frameworks needed
+- PREREQUISITES (depth 1-2): Knowledge and skills needed before starting
+- IMPLEMENTATION PHASES (depth 1-3): Step-by-step implementation breakdown
+  - Phase 1: Setup and foundation
+  - Phase 2: Core features
+  - Phase 3: Advanced features
+  - Phase 4: Polish and optimization
+- TOOLS & LIBRARIES (depth 1-2): Specific tools, packages, and services
+- APIs & SERVICES (depth 1-2): External APIs and services to integrate
+- DATABASE & STORAGE (depth 1-2): Data storage decisions
+- DEPLOYMENT (depth 1-2): Hosting, deployment, CI/CD
+- BEST PRACTICES (depth 1-3): Architecture patterns, security, testing
+
+FOCUS ON:
+- Practical technologies and frameworks
+- Step-by-step implementation guidance
+- Tools and libraries with specific recommendations
+- Deployment and hosting options
+- Architecture decisions and trade-offs
+- Testing and debugging approaches
+- Performance optimization techniques
+
+NODE QUANTITY:
+- Generate 20-30 nodes covering the full project lifecycle
+- Include specific technology recommendations
+
+Do NOT include:
+- Overly theoretical concepts unrelated to building
+- Technologies that are not practically useful for this project
+- Generic advice without specific implementation guidance
+
+CRITICAL REQUIREMENTS:
+1. Generate 20-30 nodes
+2. All node IDs must be lowercase with underscores
+3. All edges must reference existing nodes
+4. Return ONLY the JSON object — no markdown fences

@@ -17,29 +17,18 @@ graph_service = GraphService()
 
 @router.post("/generate-graph", response_model=GraphResponse)
 async def generate_graph(request: TopicRequest):
-    """
-    Generate a knowledge graph for a topic
-
-    Args:
-        request: TopicRequest containing the topic name
-
-    Returns:
-        GraphResponse with overview, graph, and node_details
-
-    Raises:
-        HTTPException: If graph generation fails
-    """
-    logger.info(f"Received graph generation request for topic: {request.topic}")
+    logger.info(f"Received graph generation request for topic: {request.topic} mode: {request.mode}")
 
     try:
-        # Validate topic
         if not request.topic or not request.topic.strip():
             logger.warning("Empty topic provided")
             raise HTTPException(status_code=400, detail="Topic cannot be empty")
 
-        # Generate graph
-        logger.info(f"Generating graph for topic: {request.topic}")
-        response = graph_service.generate_graph(request.topic)
+        valid_modes = {"learn", "interview", "project", "research", "quick"}
+        mode = request.mode if request.mode in valid_modes else "learn"
+
+        logger.info(f"Generating graph for topic: {request.topic} mode: {mode}")
+        response = graph_service.generate_graph(request.topic, mode)
 
         logger.info(f"Successfully generated graph with {len(response.graph.nodes)} nodes and {len(response.graph.edges)} edges")
         return response

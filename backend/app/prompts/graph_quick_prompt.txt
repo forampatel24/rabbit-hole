@@ -1,0 +1,72 @@
+Generate a concise quick overview knowledge graph for: {TOPIC}
+
+Return ONLY valid JSON. No markdown, no explanations, no additional text.
+
+The JSON structure MUST be:
+{
+  "overview": {
+    "topic": "{TOPIC}",
+    "domain": "appropriate domain",
+    "difficulty": "Beginner|Intermediate|Advanced",
+    "estimated_learning_time": "time estimate",
+    "popularity": "Low|Medium|High|Very High",
+    "importance_level": "Low|Medium|High|Very High",
+    "applications": ["app1", "app2"],
+    "summary": "concise summary"
+  },
+  "nodes": [
+    {
+      "id": "unique_lowercase_id",
+      "name": "Concept Name",
+      "type": "core_concept|prerequisite|application|related_concept",
+      "description": "brief but informative description",
+      "difficulty": "Beginner|Intermediate|Advanced",
+      "importance_score": 8.5,
+      "estimated_learning_time": "duration",
+      "prerequisites": ["id1", "id2"],
+      "unlocks": ["id3", "id4"],
+      "applications": ["app1"],
+      "why_it_matters": "one sentence on why this matters",
+      "resources": {},
+      "depth": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_unique_id",
+      "source": "source_id",
+      "target": "target_id",
+      "relationship": "prerequisite|related_concept|application"
+    }
+  ]
+}
+
+MODE: QUICK OVERVIEW
+This graph provides a fast, high-level understanding of the topic.
+
+CONSTRAINTS:
+- Generate ONLY 10-15 nodes — just the essential concepts
+- Shorter descriptions (2-3 sentences max)
+- Focus on the absolute most important concepts
+- Minimal depth (max depth of 2)
+- Include only essential prerequisite relationships
+- Brief "why_it_matters" — one sentence only
+
+PRIORITIZE:
+- The 3-5 most important concepts someone must know
+- 2-3 key applications or use cases
+- 2-3 foundational prerequisites
+- 2-3 related concepts for broader context
+
+Do NOT include:
+- Niche or specialized subtopics
+- Implementation details
+- Historical background
+- Multiple layers of depth
+
+CRITICAL REQUIREMENTS:
+1. Generate exactly 10-15 nodes
+2. Maximum depth of 2
+3. All node IDs must be lowercase with underscores
+4. All edges must reference existing nodes
+5. Return ONLY the JSON object — no markdown fences

@@ -13,6 +13,7 @@ class SavedGraph(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    collection_id = Column(Integer, ForeignKey("collections.id", ondelete="SET NULL"), nullable=True, index=True)
     topic = Column(String(200), nullable=False)
     graph_data = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

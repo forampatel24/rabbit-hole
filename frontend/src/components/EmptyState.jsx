@@ -1,6 +1,14 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useRef, useEffect } from 'react'
 import { GraphContext } from '../context/GraphContext'
-import { FiHexagon, FiZap, FiBook, FiCpu, FiTrendingUp, FiGlobe } from 'react-icons/fi'
+import { FiHexagon, FiZap, FiBook, FiCpu, FiTrendingUp, FiGlobe, FiChevronDown } from 'react-icons/fi'
+
+const modes = [
+  { value: 'learn', label: 'Learn', icon: '📚' },
+  { value: 'interview', label: 'Interview Preparation', icon: '💼' },
+  { value: 'project', label: 'Project Building', icon: '🛠' },
+  { value: 'research', label: 'Research', icon: '🔬' },
+  { value: 'quick', label: 'Quick Overview', icon: '⚡' },
+]
 
 const suggestions = [
   { label: 'Transformers', icon: FiZap },
@@ -11,13 +19,27 @@ const suggestions = [
 ]
 
 export default function EmptyState() {
-  const { generateGraph, loading, error } = useContext(GraphContext)
+  const { generateGraph, loading, error, mode, setMode } = useContext(GraphContext)
   const [value, setValue] = useState('')
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const currentMode = modes.find(m => m.value === mode) || modes[0]
 
   const handleSubmit = (topic) => {
     const searchTopic = topic || value.trim()
     if (!searchTopic) return
-    generateGraph(searchTopic)
+    generateGraph(searchTopic, mode)
   }
 
   return (
@@ -41,6 +63,37 @@ export default function EmptyState() {
             {error}
           </div>
         )}
+
+        <div className="flex items-center gap-2 mb-3 justify-start">
+          <div className="relative z-[100]" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-1.5 text-xs text-text-muted bg-deep-800/80 border border-surface-600/20 rounded-lg px-3 py-1.5 hover:border-accent-blue/30 hover:text-text-primary transition-all"
+            >
+              <span>{currentMode.icon}</span>
+              <span>{currentMode.label}</span>
+              <FiChevronDown size={12} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {dropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 w-52 bg-deep-800 rounded-xl border border-surface-600/40 shadow-xl z-50 overflow-hidden">
+                {modes.map(m => (
+                  <button
+                    key={m.value}
+                    onClick={() => { setMode(m.value); setDropdownOpen(false) }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
+                      mode === m.value
+                        ? 'text-accent-blue bg-accent-blue/10'
+                        : 'text-text-secondary hover:bg-deep-700/50 hover:text-text-primary'
+                    }`}
+                  >
+                    <span>{m.icon}</span>
+                    <span>{m.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="relative mb-6">
           <input

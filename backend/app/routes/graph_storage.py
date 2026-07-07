@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from pydantic import BaseModel, Field
+from typing import Optional
 from datetime import datetime, timezone
 from ..database import get_db
 from ..models.user import User
@@ -42,6 +43,7 @@ class GraphListItem(BaseModel):
     last_opened_at: str
     completed_count: int
     total_count: int
+    collection_id: Optional[int] = None
 
 
 class GraphDetail(BaseModel):
@@ -161,6 +163,7 @@ def list_graphs(
             last_opened_at=g.last_opened_at.isoformat() if g.last_opened_at else "",
             completed_count=completed_count,
             total_count=total_count,
+            collection_id=g.collection_id,
         ))
 
     return result

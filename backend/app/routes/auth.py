@@ -3,6 +3,7 @@ Authentication routes for RabbitHole API
 Register, Login, Current User
 """
 
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field, EmailStr
@@ -11,6 +12,7 @@ from ..models.user import User
 from ..models.saved_graph import SavedGraph
 from ..auth import hash_password, verify_password, create_access_token, get_current_user
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
@@ -87,7 +89,11 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    saved_graphs = db.query(SavedGraph).filter(SavedGraph.user_id == current_user.id).order_by(SavedGraph.last_opened_at.desc()).all()
+    saved_graphs = []
+    try:
+        saved_graphs = db.query(SavedGraph).filter(SavedGraph.user_id == current_user.id).order_by(SavedGraph.last_opened_at.desc()).all()
+    except Exception as e:
+        logger.warning(f"Could not load saved graphs for /me: {e}")
     return UserResponse(
         id=current_user.id,
         username=current_user.username,

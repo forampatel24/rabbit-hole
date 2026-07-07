@@ -18,49 +18,56 @@ class GraphService:
         self.groq = GroqService()
         self.prompt_path = os.path.join(os.path.dirname(__file__), '..', 'prompts', 'graph_prompt.txt')
 
-    def generate_graph(self, topic: str) -> GraphResponse:
+    def generate_graph(self, topic: str, mode: str = "learn") -> GraphResponse:
         """
         Generate a complete knowledge graph for a topic
 
         Args:
             topic: The topic to generate a knowledge graph for
+            mode: Exploration mode (learn, interview, project, research, quick)
 
         Returns:
             GraphResponse containing overview, graph, and node_details
         """
-        logger.info(f"Starting graph generation for topic: {topic}")
+        logger.info(f"Starting graph generation for topic: {topic} mode: {mode}")
 
-        # Read prompt template
-        prompt = self._build_prompt(topic)
+        prompt = self._build_prompt(topic, mode)
         logger.info("Prompt generated successfully")
 
-        # Get response from Groq
         response_data = self.groq.generate(prompt)
         logger.info("Groq response received and parsed")
 
-        # Process the response
         return self._process_response(response_data, topic)
 
-    def _build_prompt(self, topic: str) -> str:
+    def _build_prompt(self, topic: str, mode: str = "learn") -> str:
         """
-        Build the prompt for Groq
+        Build the prompt for Groq based on exploration mode
 
         Args:
             topic: The topic to query
+            mode: Exploration mode (learn, interview, project, research, quick)
 
         Returns:
             Formatted prompt string
         """
-        logger.debug("Building prompt for topic generation")
+        logger.debug(f"Building prompt for topic generation, mode: {mode}")
 
+        mode_files = {
+            "learn": self.prompt_path,
+            "interview": self.prompt_path.replace("graph_prompt.txt", "graph_interview_prompt.txt"),
+            "project": self.prompt_path.replace("graph_prompt.txt", "graph_project_prompt.txt"),
+            "research": self.prompt_path.replace("graph_prompt.txt", "graph_research_prompt.txt"),
+            "quick": self.prompt_path.replace("graph_prompt.txt", "graph_quick_prompt.txt"),
+        }
+
+        prompt_file = mode_files.get(mode, self.prompt_path)
         try:
-            with open(self.prompt_path, 'r') as f:
+            with open(prompt_file, 'r') as f:
                 template = f.read()
         except FileNotFoundError:
-            logger.warning(f"Prompt file not found at {self.prompt_path}, using default template")
+            logger.warning(f"Prompt file not found for mode '{mode}' at {prompt_file}, using default")
             template = self._get_default_prompt_template()
 
-        # Replace topic placeholder
         prompt = template.replace("{TOPIC}", topic)
         logger.debug(f"Prompt built successfully, length: {len(prompt)}")
         return prompt
