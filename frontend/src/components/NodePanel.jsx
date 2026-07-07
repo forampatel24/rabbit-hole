@@ -1,9 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { GraphContext } from '../context/GraphContext'
 import { AuthContext } from '../context/AuthContext'
+import LearningHub from './LearningHub'
 import {
   FiX, FiBook, FiBarChart2, FiClock, FiStar,
-  FiArrowRight, FiGrid, FiHeart, FiExternalLink,
+  FiArrowRight, FiGrid, FiHeart,
   FiChevronRight, FiZap, FiLayers, FiCheckCircle, FiCircle
 } from 'react-icons/fi'
 
@@ -14,8 +15,15 @@ const difficultyColors = {
 }
 
 export default function NodePanel() {
-  const { selectedNodeId, nodeDetails, closePanel, expandNode, savedGraphId, completions, toggleCompletion } = useContext(GraphContext)
+  const { selectedNodeId, nodeDetails, closePanel, expandNode, savedGraphId, completions, toggleCompletion, fetchResources, resources, resourceLoading } = useContext(GraphContext)
   const { user } = useContext(AuthContext)
+
+  useEffect(() => {
+    if (selectedNodeId && nodeDetails[selectedNodeId]?.name) {
+      fetchResources(nodeDetails[selectedNodeId].name)
+    }
+  }, [selectedNodeId])
+
   if (!selectedNodeId) return null
   const node = nodeDetails[selectedNodeId]
   if (!node) return null
@@ -115,15 +123,15 @@ export default function NodePanel() {
           </Section>
         )}
 
-        {node.resources && Object.keys(node.resources).length > 0 && (
-          <Section icon={FiExternalLink} title="Resources" accent="text-accent-cyan">
-            {Object.entries(node.resources).map(([key, val]) => (
-              <div key={key} className="flex items-center gap-2 text-sm text-accent-cyan">
-                <FiExternalLink className="shrink-0 text-xs" />
-                <span className="truncate">{String(val)}</span>
-              </div>
-            ))}
-          </Section>
+        {resourceLoading[node.name] && (
+          <div className="flex items-center gap-2 text-xs text-text-muted py-2">
+            <div className="w-3 h-3 border-2 border-accent-blue border-t-transparent rounded-full animate-spin" />
+            Loading learning resources...
+          </div>
+        )}
+
+        {resources[node.name] && !resourceLoading[node.name] && (
+          <LearningHub resources={resources[node.name]} />
         )}
       </div>
 

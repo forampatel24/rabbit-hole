@@ -7,7 +7,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from .routes import health, graph, expansion, knowledge_gap, auth, graph_storage
+from .routes import health, graph, expansion, knowledge_gap, auth, graph_storage, resources
 from .database import engine, Base
 
 # Configure logging
@@ -51,6 +51,7 @@ app.include_router(expansion.router)
 app.include_router(knowledge_gap.router)
 app.include_router(auth.router)
 app.include_router(graph_storage.router)
+app.include_router(resources.router)
 
 # Root endpoint
 @app.get("/")

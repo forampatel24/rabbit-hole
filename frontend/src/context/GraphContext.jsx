@@ -15,6 +15,8 @@ export function GraphProvider({ children }) {
   const [savedGraphId, setSavedGraphId] = useState(null)
   const [notes, setNotes] = useState('')
   const [completions, setCompletions] = useState({})
+  const [resources, setResources] = useState({})
+  const [resourceLoading, setResourceLoading] = useState({})
 
   const expandedNodes = useRef(new Set())
 
@@ -165,6 +167,22 @@ export function GraphProvider({ children }) {
     }
   }, [savedGraphId])
 
+  const fetchResources = useCallback(async (conceptName) => {
+    if (!conceptName) return
+    if (resources[conceptName]) return
+
+    setResourceLoading(prev => ({ ...prev, [conceptName]: true }))
+    try {
+      const res = await api.get(`/resources/${encodeURIComponent(conceptName)}`)
+      setResources(prev => ({ ...prev, [conceptName]: res.data }))
+    } catch (err) {
+      console.error('Failed to fetch resources:', err)
+      setResources(prev => ({ ...prev, [conceptName]: { youtube: [], courses: [], papers: [], github: [] } }))
+    } finally {
+      setResourceLoading(prev => ({ ...prev, [conceptName]: false }))
+    }
+  }, [resources])
+
   const toggleCompletion = useCallback(async (nodeId) => {
     if (!savedGraphId) return
     const current = completions[nodeId] || false
@@ -192,7 +210,10 @@ export function GraphProvider({ children }) {
       savedGraphId,
       notes,
       completions,
+      resources,
+      resourceLoading,
       generateGraph,
+      fetchResources,
       openNodePanel,
       closePanel,
       expandNode,

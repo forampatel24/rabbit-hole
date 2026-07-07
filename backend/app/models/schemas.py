@@ -93,6 +93,46 @@ class KnowledgeGapResponse(BaseModel):
     learning_path: List[str]
 
 
+class YouTubeResource(BaseModel):
+    title: str
+    channel: str
+    thumbnail: str
+    url: str
+    duration: str
+
+
+class CourseResource(BaseModel):
+    provider: str
+    title: str
+    url: str
+    thumbnail: Optional[str] = None
+
+
+class PaperResource(BaseModel):
+    title: str
+    authors: List[str]
+    year: Optional[int] = None
+    citation_count: Optional[int] = None
+    doi: Optional[str] = None
+    openalex_url: Optional[str] = None
+    pdf_url: Optional[str] = None
+
+
+class GitHubResource(BaseModel):
+    repo_name: str
+    description: Optional[str] = None
+    stars: Optional[int] = None
+    language: Optional[str] = None
+    url: str
+
+
+class LearningResourcesResponse(BaseModel):
+    youtube: List[YouTubeResource] = Field(default_factory=list)
+    courses: List[CourseResource] = Field(default_factory=list)
+    papers: List[PaperResource] = Field(default_factory=list)
+    github: List[GitHubResource] = Field(default_factory=list)
+
+
 class ErrorResponse(BaseModel):
     """Error response"""
     error: bool
