@@ -1,4 +1,4 @@
-Generate a research-oriented knowledge graph for the topic: {TOPIC}
+Generate a deep research-oriented knowledge graph for the topic: {TOPIC}
 
 Return ONLY valid JSON. No markdown, no explanations, no additional text.
 
@@ -12,22 +12,28 @@ The JSON structure MUST be:
     "popularity": "Low|Medium|High|Very High",
     "importance_level": "Low|Medium|High|Very High",
     "applications": ["app1", "app2"],
-    "summary": "brief summary with research context"
+    "summary": "comprehensive research summary covering the field's significance, current state, and future outlook"
   },
   "nodes": [
     {
       "id": "unique_lowercase_id",
       "name": "Concept Name",
-      "type": "foundation|seminal_work|recent_advance|research_direction|method|state_of_art|open_problem|related_field|tool|benchmark",
-      "description": "detailed explanation with research context",
+      "type": "foundation|seminal_paper|state_of_art|recent_advance|research_direction|open_problem|methodology|benchmark|dataset|research_group|challenge|emerging_trend|application_area|tool|related_field",
+      "description": "detailed research-oriented explanation with key findings, authors, and impact",
       "difficulty": "Beginner|Intermediate|Advanced",
       "importance_score": 8.5,
       "estimated_learning_time": "duration",
       "prerequisites": ["id1", "id2"],
       "unlocks": ["id3", "id4"],
       "applications": ["app1"],
-      "why_it_matters": "research significance and impact",
-      "resources": {},
+      "why_it_matters": "research significance, impact on the field, and why researchers care",
+      "resources": {
+        "key_papers": [
+          {"title": "Paper Title", "authors": ["Author1", "Author2"], "year": 2024, "venue": "Conference/Journal", "impact": "highly influential"}
+        ],
+        "key_researchers": ["Researcher1", "Researcher2"],
+        "leading_labs": ["Lab/Institution1"]
+      },
       "depth": 0
     }
   ],
@@ -36,51 +42,88 @@ The JSON structure MUST be:
       "id": "edge_unique_id",
       "source": "source_id",
       "target": "target_id",
-      "relationship": "foundation|builds_upon|inspires|challenges|improves|related_to|state_of_art|method"
+      "relationship": "foundation|builds_upon|seminal_work|inspires|challenges|improves|state_of_art|method|evaluated_by|contrasts_with|extends|related_to"
     }
   ]
 }
 
-MODE: RESEARCH
-This graph is for someone exploring the research landscape.
+MODE: DEEP RESEARCH
+This graph is for researchers, academics, or serious learners exploring the research landscape in depth.
 
-FOCUS ON:
-- Seminal papers and foundational works
-- State-of-the-art methods and approaches
-- Recent advances and breakthrough results
-- Active research directions and open problems
-- Key researchers and institutions
-- Benchmarks and evaluation methodologies
-- Current challenges and limitations
-- Emerging trends and future directions
+STRUCTURE THE GRAPH AS A RESEARCH LANDSCAPE:
 
-STRUCTURE:
-- FOUNDATIONS (depth 0-1): Classic papers, fundamental theories, historical context
-- SEMINAL WORKS (depth 1-2): Landmark papers that defined the field
-- STATE OF THE ART (depth 1-3): Current best-performing methods
-- RESEARCH DIRECTIONS (depth 2-3): Active areas of investigation
-- OPEN PROBLEMS (depth 2-3): Unsolved challenges and limitations
-- METHODS & TECHNIQUES (depth 1-3): Key methodological approaches
-- BENCHMARKS & DATASETS (depth 1-2): Standard evaluation resources
-- RELATED FIELDS (depth 1-2): Adjacent research areas
+1. FOUNDATIONS (depth 0-1): Foundational theories, classic papers (pre-2010s), historical breakthroughs
+   - Include the original papers/works that established the field
+   - Key theorems, formalisms, or conceptual breakthroughs
+
+2. SEMINAL PAPERS & BREAKTHROUGHS (depth 1-2): Landmark works that shifted the field
+   - Include paper titles, authors, year, venue, citation impact
+   - Explain why each paper was a breakthrough
+
+3. STATE OF THE ART (depth 1-3): Current best-performing approaches and systems
+   - Latest SOTA methods with performance metrics
+   - Leading models, architectures, or frameworks
+   - Benchmark scores and rankings
+
+4. METHODOLOGIES & APPROACHES (depth 1-3): Key methodological paradigms
+   - Different schools of thought or approaches
+   - Mathematical/technical foundations of each method
+   - When to use which approach
+
+5. BENCHMARKS & DATASETS (depth 1-2): Standard evaluation resources
+   - Widely used datasets with size, composition, and limitations
+   - Evaluation metrics and protocols
+   - Leaderboards and challenge competitions
+
+6. RECENT ADVANCES (depth 2-3): Breakthroughs from the last 2-3 years
+   - Novel architectures, techniques, or findings
+   - Papers that opened new sub-directions
+   - Results that challenged prior assumptions
+
+7. OPEN PROBLEMS & CHALLENGES (depth 2-3): Current unsolved issues
+   - Theoretical limitations and open questions
+   - Practical challenges in deployment
+   - Ethical concerns and societal implications
+
+8. EMERGING TRENDS & FUTURE DIRECTIONS (depth 2-3): Where the field is heading
+   - Promising new research directions
+   - Cross-pollination with other fields
+   - Predicted breakthroughs and next frontiers
+
+9. KEY RESEARCHERS & GROUPS (depth 1-2): Influential people and labs
+   - Leading researchers and their contributions
+   - Major research groups and institutions
+   - Conferences and venues where work is published
+
+10. RELATED FIELDS & INTERSECTIONS (depth 1-2): Adjacent research areas
+    - Interdisciplinary connections
+    - How this field relates to others
+    - Cross-domain applications
 
 NODE QUANTITY:
-- Generate 20-30 nodes
-- Prioritize high-impact and influential concepts
+- Generate a MINIMUM OF 30 NODES — this is research-grade depth
+- For broad topics, scale up to 40-60+ nodes
+- No upper cap — more nodes = better coverage
+- Quality and depth over shallow breadth; every node must add substantial value
 
-Include in descriptions:
-- Key papers or authors associated with this concept
-- Significance and impact on the field
-- Current state and limitations
-- Links to related research directions
+INCLUDE IN DESCRIPTIONS:
+- Key papers with title, authors, year, and venue
+- Why each concept is important for research
+- Current limitations and open questions
+- Connections to other research areas
+- Citation impact and influence where relevant
+- Specific technical details that researchers would need to know
 
 Do NOT include:
 - Purely introductory content covered in standard textbooks
-- Outdated or superseded approaches without historical significance
 - Commercial products without research relevance
+- Outdated approaches without historical significance
+- Generic descriptions without specific research context
 
 CRITICAL REQUIREMENTS:
-1. Generate 20-30 nodes
+1. Generate MINIMUM 30 nodes — scale up to 40-60+ for broad/complex topics
 2. All node IDs must be lowercase with underscores
 3. All edges must reference existing nodes
-4. Return ONLY the JSON object — no markdown fences
+4. Include key_papers, key_researchers in resources where applicable
+5. Cover all 10 research landscape sections (Foundations through Related Fields)
+6. Return ONLY the JSON object — no markdown fences

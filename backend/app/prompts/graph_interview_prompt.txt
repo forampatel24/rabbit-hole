@@ -1,4 +1,4 @@
-Generate a knowledge graph for interview preparation on the topic: {TOPIC}
+Generate a comprehensive interview preparation knowledge graph for the topic: {TOPIC}
 
 Return ONLY valid JSON. No markdown, no explanations, no additional text.
 
@@ -12,22 +12,28 @@ The JSON structure MUST be:
     "popularity": "Low|Medium|High|Very High",
     "importance_level": "Low|Medium|High|Very High",
     "applications": ["app1", "app2"],
-    "summary": "brief summary focused on interview relevance"
+    "summary": "comprehensive overview of interview importance, all key topic areas covered, question themes, and what interviewers look for"
   },
   "nodes": [
     {
       "id": "unique_lowercase_id",
       "name": "Concept Name",
-      "type": "prerequisite|core_concept|intermediate_concept|advanced_concept|application|framework|tool|mathematical_foundation|related_concept|subtopic",
-      "description": "detailed explanation with interview context",
+      "type": "must_know|frequently_asked|coding_pattern|system_design_fundamental|behavioral|optimization_tip|common_pitfall|core_concept|application|related_concept",
+      "description": "detailed explanation with interview context, specific questions interviewers ask, how to approach answering them, time complexity, and common mistakes",
       "difficulty": "Beginner|Intermediate|Advanced",
       "importance_score": 8.5,
       "estimated_learning_time": "duration",
       "prerequisites": ["id1", "id2"],
       "unlocks": ["id3", "id4"],
       "applications": ["app1"],
-      "why_it_matters": "why this matters for interviews",
-      "resources": {},
+      "why_it_matters": "why this is frequently tested in interviews and how it differentiates candidates",
+      "resources": {
+        "interview_questions": [
+          "Q: Common interview question about this concept?",
+          "Q: Another frequently asked question?",
+          "Q: Follow-up question interviewers use to probe depth?"
+        ]
+      },
       "depth": 0
     }
   ],
@@ -36,45 +42,110 @@ The JSON structure MUST be:
       "id": "edge_unique_id",
       "source": "source_id",
       "target": "target_id",
-      "relationship": "prerequisite|related_concept|intermediate_concept|advanced_concept|application|framework|tool|mathematical_foundation|subtopic"
+      "relationship": "prerequisite|must_know_before|frequently_asked|builds_upon|related_to|application|contrasts_with|deep_dive"
     }
   ]
 }
 
-MODE: INTERVIEW PREPARATION
-This graph is for someone preparing for technical interviews.
+MODE: INTERVIEW PREPARATION — COMPREHENSIVE COVERAGE
+This graph is for someone preparing for technical interviews. It must cover ALL important topics comprehensively so they get a complete study checklist. When a user generates this graph, they should instantly see every essential topic they need to study for the interview.
 
-FOCUS ON:
-- Frequently asked interview questions and concepts
-- Important algorithms, data structures, and problem-solving patterns
-- Common pitfalls and edge cases interviewers test
-- Key concepts that interviewers expect candidates to know
-- Practical coding patterns and approaches
-- System design concepts where applicable
-- Time and space complexity analysis
+COVERAGE REQUIREMENTS — INCLUDE ALL OF THESE CATEGORIES:
+
+1. DATA STRUCTURES (depth 0-2):
+   - Arrays, Strings, Linked Lists, Stacks, Queues, Hash Tables
+   - Trees (BST, Heaps, Tries, Segment Trees)
+   - Graphs (adjacency list/matrix, traversals)
+   - Advanced structures (Bloom Filters, LRU Cache)
+
+2. ALGORITHMS (depth 0-2):
+   - Sorting (Quick, Merge, Heap, Counting, Radix)
+   - Searching (Binary Search, Binary Search on Answer)
+   - Two Pointers, Sliding Window, Prefix Sum
+   - Recursion & Backtracking
+   - Dynamic Programming (Knapsack, LCS, LIS, Memoization vs Tabulation)
+   - Graph Algorithms (BFS, DFS, Dijkstra, Topological Sort, Union-Find)
+   - Greedy Algorithms
+   - Divide and Conquer
+   - Bit Manipulation
+
+3. CODING PATTERNS (depth 1-2):
+   - Fast & Slow Pointers, Merge Intervals, Cyclic Sort
+   - In-place Reversal, Tree BFS/DFS, Two Heaps
+   - Subsets, Modified Binary Search, Top K Elements
+   - K-way Merge, 0/1 Knapsack, Topological Sort
+
+4. SYSTEM DESIGN (depth 2-3):
+   - Scalability (horizontal vs vertical, sharding, replication)
+   - Databases (SQL vs NoSQL, indexing, partitioning)
+   - Caching (CDN, Redis, Memcached)
+   - Load Balancing, Message Queues, Microservices
+   - CAP Theorem, Consistent Hashing, Rate Limiting
+   - Real-world designs (URL shortener, chat system, etc.)
+
+5. OPERATING SYSTEMS & CONCURRENCY (depth 1-2):
+   - Processes vs Threads, Context Switching
+   - Mutex, Semaphore, Deadlock
+   - Memory Management (paging, segmentation)
+   - Concurrency patterns (producer-consumer, reader-writer)
+
+6. NETWORKING (depth 1-2):
+   - TCP/IP, HTTP/HTTPS, DNS, WebSockets
+   - REST vs GraphQL
+   - Load Balancing, Proxies
+
+7. COMPLEXITY ANALYSIS (depth 0-1):
+   - Big O, Omega, Theta
+   - Time-space tradeoffs
+   - Amortized analysis
+
+8. BEHAVIORAL & SOFT SKILLS (depth 1):
+   - STAR method, storytelling framework
+   - Leadership principles, conflict resolution
+   - Common behavioral questions with frameworks
+
+9. OBJECT-ORIENTED DESIGN (depth 1-2):
+   - SOLID principles, Design Patterns (Singleton, Factory, Observer, etc.)
+   - OOD interview problems (Parking Lot, Elevator, etc.)
 
 NODE QUANTITY:
-- Generate 20-30 nodes focused on interview-relevant content
-- Quality over breadth - cover what matters for interviews
+- GENERATE A MINIMUM OF 15 NODES — scale up for comprehensive coverage
+- For broader topics, generate 20-30+ nodes to cover all important subtopics
+- This is a complete study checklist — the user should not miss anything important
+- Every major subtopic listed above must have at least one corresponding node
 
-DEPTH AND STRUCTURE:
-- Prerequisites (depth 0-1): Foundational knowledge interviewers assume
-- Core Concepts (depth 1-2): Must-know topics for interviews
-- Advanced Topics (depth 2-3): Differentiation topics for senior roles
-- Common Problems (depth 1-3): Frequently asked problem categories with specific examples
+INCLUDE IN DESCRIPTIONS:
+- The exact interview question(s) this concept addresses
+- What interviewers are really testing (not just the surface skill)
+- Common mistakes and how to avoid them
+- Key formula, pattern, or technique to remember
+- Typical follow-up questions that probe deeper
+- Time complexity of different approaches
+- Specific LeetCode problem numbers or equivalent examples where applicable
 
-Include in descriptions:
-- Why this concept is frequently asked
-- Common mistakes or pitfalls
-- Key techniques or patterns to remember
+EVERY NODE MUST HAVE in resources.interview_questions:
+- At least 2-3 specific interview questions related to this concept
+- Questions should range from basic to advanced
+- Include common follow-up questions
+
+INCLUDE IN overview.summary:
+- Brief overview of the topic's interview importance
+- Key themes interviewers focus on across all covered areas
+- Most critical tips for interview success
+- What topics are most heavily weighted
 
 Do NOT include:
 - Overly theoretical content rarely asked in interviews
-- Trivial or filler concepts
+- Trivial or filler concepts that waste study time
 - Obsolete technologies or approaches
+- Information that doesn't help pass the interview
 
 CRITICAL REQUIREMENTS:
-1. Generate 20-30 nodes
-2. All node IDs must be lowercase with underscores
-3. All edges must reference existing nodes
-4. Return ONLY the JSON object — no markdown fences
+1. Generate MINIMUM 15 nodes — scale up for comprehensive coverage
+2. Every node MUST include interview_questions in resources
+3. All node IDs must be lowercase with underscores
+4. All edges must reference existing nodes
+5. Descriptions MUST mention specific interview questions
+6. Cover all the major categories listed above
+7. This should serve as a complete interview study checklist
+8. Return ONLY the JSON object — no markdown fences

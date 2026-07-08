@@ -2,10 +2,15 @@ import React, { memo } from 'react'
 import { Handle, Position } from 'reactflow'
 import {
   FiBook, FiCpu, FiZap, FiGrid, FiTool,
-  FiLayers, FiHash, FiBox, FiCheckCircle
+  FiLayers, FiHash, FiBox, FiCheckCircle,
+  FiFile, FiAward, FiCompass, FiTarget,
+  FiFlag, FiCloud, FiCode, FiServer,
+  FiUsers, FiStar, FiAlertTriangle, FiTrendingUp,
+  FiDatabase, FiChevronRight
 } from 'react-icons/fi'
 
 const nodeTypeConfig = {
+  // Shared
   prerequisite: {
     icon: FiBook,
     color: '#3B82F6',
@@ -22,6 +27,11 @@ const nodeTypeConfig = {
     label: 'Advanced',
   },
   application: {
+    icon: FiGrid,
+    color: '#F59E0B',
+    label: 'Application',
+  },
+  application_area: {
     icon: FiGrid,
     color: '#F59E0B',
     label: 'Application',
@@ -45,6 +55,162 @@ const nodeTypeConfig = {
     icon: FiBox,
     color: '#64748B',
     label: 'Related',
+  },
+  related_field: {
+    icon: FiBox,
+    color: '#64748B',
+    label: 'Related',
+  },
+  concept: {
+    icon: FiBook,
+    color: '#64748B',
+    label: 'Concept',
+  },
+
+  // Research mode
+  foundation: {
+    icon: FiLayers,
+    color: '#3B82F6',
+    label: 'Foundation',
+  },
+  seminal_paper: {
+    icon: FiFile,
+    color: '#8B5CF6',
+    label: 'Seminal Paper',
+  },
+  state_of_art: {
+    icon: FiAward,
+    color: '#F59E0B',
+    label: 'SOTA',
+  },
+  recent_advance: {
+    icon: FiZap,
+    color: '#EC4899',
+    label: 'Recent Advance',
+  },
+  research_direction: {
+    icon: FiCompass,
+    color: '#06B6D4',
+    label: 'Research Direction',
+  },
+  open_problem: {
+    icon: FiAlertTriangle,
+    color: '#EF4444',
+    label: 'Open Problem',
+  },
+  challenge: {
+    icon: FiAlertTriangle,
+    color: '#EF4444',
+    label: 'Challenge',
+  },
+  methodology: {
+    icon: FiLayers,
+    color: '#10B981',
+    label: 'Methodology',
+  },
+  benchmark: {
+    icon: FiTrendingUp,
+    color: '#F59E0B',
+    label: 'Benchmark',
+  },
+  dataset: {
+    icon: FiDatabase,
+    color: '#3B82F6',
+    label: 'Dataset',
+  },
+  research_group: {
+    icon: FiUsers,
+    color: '#64748B',
+    label: 'Research Group',
+  },
+  emerging_trend: {
+    icon: FiTrendingUp,
+    color: '#EC4899',
+    label: 'Emerging Trend',
+  },
+
+  // Interview mode
+  must_know: {
+    icon: FiStar,
+    color: '#EF4444',
+    label: 'Must Know',
+  },
+  frequently_asked: {
+    icon: FiZap,
+    color: '#F59E0B',
+    label: 'Frequently Asked',
+  },
+  coding_pattern: {
+    icon: FiCode,
+    color: '#10B981',
+    label: 'Coding Pattern',
+  },
+  system_design_fundamental: {
+    icon: FiServer,
+    color: '#8B5CF6',
+    label: 'System Design',
+  },
+  behavioral: {
+    icon: FiUsers,
+    color: '#3B82F6',
+    label: 'Behavioral',
+  },
+  optimization_tip: {
+    icon: FiTrendingUp,
+    color: '#06B6D4',
+    label: 'Optimization Tip',
+  },
+  common_pitfall: {
+    icon: FiAlertTriangle,
+    color: '#EF4444',
+    label: 'Common Pitfall',
+  },
+
+  // Project mode
+  goal: {
+    icon: FiTarget,
+    color: '#EF4444',
+    label: 'Goal',
+  },
+  phase: {
+    icon: FiLayers,
+    color: '#8B5CF6',
+    label: 'Phase',
+  },
+  step: {
+    icon: FiChevronRight,
+    color: '#10B981',
+    label: 'Step',
+  },
+  technology_option: {
+    icon: FiTool,
+    color: '#06B6D4',
+    label: 'Tech Option',
+  },
+  tool_alternative: {
+    icon: FiTool,
+    color: '#F59E0B',
+    label: 'Alternative',
+  },
+  milestone: {
+    icon: FiFlag,
+    color: '#10B981',
+    label: 'Milestone',
+  },
+  deployment_option: {
+    icon: FiCloud,
+    color: '#3B82F6',
+    label: 'Deployment',
+  },
+  database: {
+    icon: FiDatabase,
+    color: '#EC4899',
+    label: 'Database',
+  },
+  api_service: {
+    icon: FiServer,
+    color: '#F59E0B',
+    label: 'API Service',
   },
 }
 

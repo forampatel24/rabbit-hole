@@ -1,4 +1,4 @@
-Generate a project-building knowledge graph for: {TOPIC}
+Generate a project-building flowchart-style knowledge graph for: {TOPIC}
 
 Return ONLY valid JSON. No markdown, no explanations, no additional text.
 
@@ -12,22 +12,39 @@ The JSON structure MUST be:
     "popularity": "Low|Medium|High|Very High",
     "importance_level": "Low|Medium|High|Very High",
     "applications": ["app1", "app2"],
-    "summary": "brief summary of what this project involves"
+    "summary": "brief project overview — what we are building, the tech stack approach, and expected outcome"
   },
   "nodes": [
     {
       "id": "unique_lowercase_id",
       "name": "Concept Name",
-      "type": "goal|technology|prerequisite|implementation|deployment|tool|framework|concept|api|database|service",
-      "description": "detailed explanation",
+      "type": "goal|phase|step|technology_option|tool_alternative|milestone|deployment_option|prerequisite|database|api_service|concept",
+      "description": "detailed explanation of this step, what to do, which technologies to use, and how to execute it",
       "difficulty": "Beginner|Intermediate|Advanced",
       "importance_score": 8.5,
       "estimated_learning_time": "duration",
       "prerequisites": ["id1", "id2"],
       "unlocks": ["id3", "id4"],
       "applications": ["app1"],
-      "why_it_matters": "why this is needed for the project",
-      "resources": {},
+      "why_it_matters": "why this step/technology/decision matters for the project",
+      "resources": {
+        "technology_alternatives": [
+          {"name": "Tech A", "pros": ["fast", "well-documented"], "cons": ["steep learning curve"], "best_for": "use case"},
+          {"name": "Tech B", "pros": ["beginner-friendly"], "cons": ["slower performance"], "best_for": "MVP"}
+        ],
+        "execution_guide": {
+          "languages": ["Python 3.x", "JavaScript (ES6+)"],
+          "frameworks": ["React 18", "Django 5", "Node.js 20"],
+          "tools": ["Git", "Docker", "VS Code"],
+          "setup_commands": "pip install django djangorestframework; npx create-react-app frontend",
+          "how_to_execute": "Step-by-step instructions on what to code, which files to create, and how to run it",
+          "code_snippet": "Relevant code example showing the implementation approach",
+          "common_mistakes": ["Mistake 1 to avoid", "Mistake 2 to avoid"],
+          "verification": "How to verify this step worked correctly"
+        },
+        "setup_commands": "key setup or install commands",
+        "recommended_learning": "short description of what to learn for this step"
+      },
       "depth": 0
     }
   ],
@@ -36,49 +53,121 @@ The JSON structure MUST be:
       "id": "edge_unique_id",
       "source": "source_id",
       "target": "target_id",
-      "relationship": "prerequisite|implements|deploys|uses|builds_upon|requires|technology|tool|deployment"
+      "relationship": "next_step|prerequisite|implements|deploys_with|alternative_to|uses|builds_upon|requires|deploy_option|technology_choice"
     }
   ]
 }
 
-MODE: PROJECT BUILDING
-This graph is for someone who wants to BUILD something practical.
+MODE: PROJECT BUILDING — EXECUTABLE FLOWCHART
+This graph is for someone who wants to BUILD a practical project. Every node must tell them EXACTLY what to do, which technologies to use (specific languages, frameworks, tools), and how to execute each step.
 
-STRUCTURE THE GRAPH AS A PROJECT ROADMAP:
-- GOAL (depth 0): The main project goal — what are we building?
-- REQUIRED TECHNOLOGIES (depth 1): Core technologies, languages, frameworks needed
-- PREREQUISITES (depth 1-2): Knowledge and skills needed before starting
-- IMPLEMENTATION PHASES (depth 1-3): Step-by-step implementation breakdown
-  - Phase 1: Setup and foundation
-  - Phase 2: Core features
-  - Phase 3: Advanced features
-  - Phase 4: Polish and optimization
-- TOOLS & LIBRARIES (depth 1-2): Specific tools, packages, and services
-- APIs & SERVICES (depth 1-2): External APIs and services to integrate
-- DATABASE & STORAGE (depth 1-2): Data storage decisions
-- DEPLOYMENT (depth 1-2): Hosting, deployment, CI/CD
-- BEST PRACTICES (depth 1-3): Architecture patterns, security, testing
+STRUCTURE THE GRAPH AS A PROJECT ROADMAP FLOWCHART:
 
-FOCUS ON:
-- Practical technologies and frameworks
-- Step-by-step implementation guidance
-- Tools and libraries with specific recommendations
-- Deployment and hosting options
-- Architecture decisions and trade-offs
-- Testing and debugging approaches
-- Performance optimization techniques
+PHASE 0: PROJECT GOAL (depth 0)
+- The main project goal node — what we are building
+- Brief scope and expected deliverables
+- Target audience and use case
+
+PHASE 1: PLANNING & ARCHITECTURE (depth 1)
+- Requirements gathering and feature list
+- Architecture decisions with specific technology recommendations
+  - Frontend: e.g., React, Vue, Angular, Svelte
+  - Backend: e.g., Django, Flask, FastAPI, Node.js/Express, Spring Boot, Go
+  - Database: e.g., PostgreSQL, MySQL, MongoDB, Redis
+  - Explain WHY each tech choice fits this project
+- Tech stack selection with alternatives at each layer
+- Wireframing / UI planning with specific tools (Figma, etc.)
+
+PHASE 2: SETUP & FOUNDATION (depth 1-2)
+- Development environment setup with exact commands
+  - "Install Python 3.11, create virtual env, install Django 5.0"
+  - "npx create-react-app frontend --template typescript"
+- Project scaffolding and folder structure
+  - Show the exact directory tree to create
+- Version control setup (git init, .gitignore rules)
+- CI/CD pipeline setup (GitHub Actions, etc.)
+- Database schema design with specific DB and ORM
+  - "Use Django Models with PostgreSQL"
+  - "Define User, Product, Order models with these fields..."
+
+PHASE 3: CORE DEVELOPMENT (depth 2-3)
+- Build core features step by step with specific technologies
+  - Authentication: "Use JWT with Django REST Framework — here's the endpoint code"
+  - API Design: "Create REST endpoints at /api/v1/users, /api/v1/products"
+  - Frontend: "Build React components: ProductCard, Navbar, CheckoutForm"
+  - State Management: "Use React Context for auth state, Redux for cart"
+- Each step must specify: language, framework, exact file to create/modify
+- Testing: "Write pytest tests for API endpoints; use React Testing Library for components"
+
+PHASE 4: INTEGRATION & POLISH (depth 2-3)
+- Third-party API integrations (Stripe for payments, SendGrid for emails)
+- Error handling and logging (Sentry, structured logging)
+- Performance optimization (Redis caching, lazy loading, CDN)
+- Security hardening (HTTPS, CORS, rate limiting, input validation)
+- UI/UX polish (Tailwind CSS, animations, responsive design)
+
+PHASE 5: TESTING & QA (depth 2-3)
+- Testing frameworks: "pytest + coverage, Jest + React Testing Library"
+- Debugging tools: "Chrome DevTools, Django Debug Toolbar"
+- Performance testing: "Locust for load testing, Lighthouse for frontend"
+- E2E testing: "Playwright or Cypress for critical user flows"
+
+PHASE 6: DEPLOYMENT & LAUNCH (depth 1-2)
+- Deployment options with specific services:
+  - Backend: "Render, Railway, AWS EC2, DigitalOcean App Platform"
+  - Frontend: "Vercel, Netlify, AWS S3 + CloudFront"
+  - Database: "AWS RDS, Supabase, MongoDB Atlas"
+- Domain, SSL, and DNS setup (Namecheap, Cloudflare)
+- Monitoring: "Sentry for errors, Datadog/Grafana for metrics"
+
+PHASE 7: MAINTENANCE & SCALING (depth 2-3)
+- Performance monitoring tools
+- Scaling strategies: "Horizontal scaling with Docker + Kubernetes, caching with Redis"
+- Feature roadmap and iterations
+- Documentation (Swagger/OpenAPI, Storybook for UI)
+
+EVERY TECHNOLOGY NODE MUST SPECIFY:
+- The exact language and version (e.g., "Python 3.11", "Node.js 20 LTS")
+- The specific framework and version (e.g., "React 18.2", "Django 5.0")
+- Any relevant tools (e.g., "VS Code with Python extension", "Postman for API testing")
+- WHY this technology was chosen for this project
+
+EVERY STEP NODE MUST INCLUDE resources.execution_guide WITH:
+- languages: array of specific languages and versions
+- frameworks: array of specific frameworks and versions
+- tools: array of development tools needed
+- setup_commands: exact terminal commands to run
+- how_to_execute: step-by-step instructions on what to code and do
+- code_snippet: a concrete code example showing the implementation
+- common_mistakes: array of mistakes to avoid
+- verification: how to confirm this step is done correctly
 
 NODE QUANTITY:
 - Generate 20-30 nodes covering the full project lifecycle
-- Include specific technology recommendations
+- Ensure adequate coverage of each phase
+
+INCLUDE IN DESCRIPTIONS:
+- Specific, actionable implementation guidance
+- Exact file paths, folder names, and code patterns
+- Common mistakes and how to avoid them
+- Trade-offs between different approaches
+
+INCLUDE IN resources.technology_alternatives:
+- For technology nodes, list 2-3 alternatives with specific names
+- Include cost, performance, and learning curve info
 
 Do NOT include:
 - Overly theoretical concepts unrelated to building
-- Technologies that are not practically useful for this project
+- Technologies without practical value for this specific project
 - Generic advice without specific implementation guidance
+- Vague instructions like "set up the project" without exact commands
 
 CRITICAL REQUIREMENTS:
 1. Generate 20-30 nodes
-2. All node IDs must be lowercase with underscores
-3. All edges must reference existing nodes
-4. Return ONLY the JSON object — no markdown fences
+2. Include technology_alternatives in resources for tech choice nodes
+3. EVERY step node MUST include execution_guide with languages, frameworks, setup_commands, how_to_execute
+4. All node IDs must be lowercase with underscores
+5. All edges must reference existing nodes
+6. Create a clear sequential flow from start to completion
+7. Tell the user EXACTLY what to do at each step — no ambiguity
+8. Return ONLY the JSON object — no markdown fences
